@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spin Match — SportyBet Nigeria Games</title>
+  <style>
+    :root {
+      --sporty-red: #e41827;
+      --sporty-red-dark: #b8111d;
+      --felt-bg: #112418;
+      --cabinet-bg: #1c1f24;
+      --cabinet-header: #252930;
+      --gold-btn: #b5a624;
+      --gold-btn-hover: #c9b92c;
+      --green-btn: #00b843;
+      --green-btn-hover: #00d14c;
+      --text-light: #ffffff;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 35%, #1c3b27 0%, #0d1c12 75%, #08110b 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Subtle Casino Felt Watermarks (Cards, Dice, Chips) */
+    .felt-decor {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      z-index: 0;
+      background-image: radial-gradient(#ffffff 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Top SportyBet Red Ribbon */
+    .sporty-navbar {
+      background: var(--sporty-red);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+    }
+    .nav-left { display: flex; align-items: center; gap: 18px; overflow-x: auto; }
+    .sporty-logo { font-weight: 900; font-size: 20px; font-style: italic; letter-spacing: -0.5px; display: flex; align-items: center; gap: 4px; color: #fff; }
+    .nav-links { display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .nav-links span { cursor: pointer; opacity: 0.92; padding: 6px 10px; border-radius: 4px; }
+    .nav-links span.active { background: #ffffff; color: var(--sporty-red); font-weight: 800; }
+    .hot-tag { background: #ffd000; color: #000; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; vertical-align: super; margin-left: 2px; }
+
+    .nav-right { display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .top-bal { color: #ffd000; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .top-link { cursor: pointer; color: #fff; background: rgba(0,0,0,0.18); padding: 6px 12px; border-radius: 4px; border: none; font-weight: 700; font-size: 12px; }
+    .top-link:hover { background: rgba(0,0,0,0.32); }
+
+    /* Center Stage & Spin Match Cabinet */
+    .stage-container {
+      position: relative;
+      z-index: 5;
+      max-width: 980px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .cabinet {
+      width: 100%;
+      max-width: 440px;
+      background: linear-gradient(180deg, #23272e 0%, #15181d 100%);
+      border-radius: 12px;
+      border: 2px solid #323741;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cabinet-top {
+      background: var(--cabinet-header);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #303540;
+    }
+    .cabinet-title { font-size: 16px; font-weight: 800; letter-spacing: 0.3px; }
+    .cabinet-icons { display: flex; align-items: center; gap: 12px; color: #4ade80; font-size: 14px; font-weight: 700; }
+
+    .cabinet-balance-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      background: rgba(0,0,0,0.28);
+      font-size: 13px;
+      font-weight: 800;
+      color: #e5e7eb;
+      gap: 6px;
+    }
+
+    /* Dual Opposing Wheels Arena */
+    .dual-wheel-arena {
+      position: relative;
+      height: 280px;
+      width: 100%;
+      background: radial-gradient(circle at center, #2c313a 0%, #16191e 85%);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid #2d323b;
+      border-bottom: 1px solid #2d323b;
+    }
+
+    .wheel-half-wrap {
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      top: 5px;
+    }
+    .wheel-left-wrap { left: -92px; }
+    .wheel-right-wrap { right: -92px; }
+
+    .wheel-disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      transition: transform 3.2s cubic-bezier(0.14, 0.86, 0.22, 1);
+      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.75));
+    }
+
+    /* Center Metallic Horizontal Bridge Pointer */
+    .center-bridge {
+      position: relative;
+      z-index: 20;
+      width: 112px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .bridge-bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      height: 10px;
+      background: linear-gradient(180deg, #f3f4f6 0%, #6b7280 50%, #d1d5db 100%);
+      border-radius: 4px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.8);
+    }
+    .bridge-needle-left {
+      width: 0; height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-right: 18px solid #e5e7eb;
+      z-index: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    }
+    .bridge-needle-right {
+      width: 0; height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-left: 18px solid #e5e7eb;
+      z-index: 2;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    }
+    .bridge-hub {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ffffff, #6b7280 70%, #1f2937 100%);
+      border: 2px solid #d1d5db;
+      margin: 0 auto;
+      z-index: 3;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.85);
+    }
+
+    /* 6 Multiplier Chip Badges Row */
+    .chips-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 16px 18px 8px;
+    }
+    .mult-chip {
+      background: #14171c;
+      border: 1px solid #2e343f;
+      border-radius: 8px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      transition: 0.2s;
+    }
+    .mult-chip .chip-val { font-size: 11px; font-weight: 800; color: #9ca3af; }
+    .mult-chip .chip-circle {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 2px dashed currentColor;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 900;
+    }
+    .mult-chip.active-hit {
+      border-color: #ffd000;
+      background: rgba(255, 208, 0, 0.14);
+      transform: translateY(-3px);
+      box-shadow: 0 0 14px rgba(255, 208, 0, 0.35);
+    }
+    .mult-chip.active-hit .chip-val { color: #ffd000; }
+    .crown-icon {
+      position: absolute;
+      top: -12px;
+      font-size: 14px;
+      display: none;
+    }
+    .mult-chip.active-hit .crown-icon { display: block; }
+
+    /* Win / Status Line */
+    .win-banner {
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #e5e7eb;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .win-banner .gold-amount { color: #ffd000; font-size: 18px; font-weight: 900; }
+
+    /* Stake Selector Bar */
+    .stake-bar {
+      padding: 8px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stake-input-row {
+      display: flex;
+      align-items: center;
+      background: #111317;
+      border: 1px solid #323741;
+      border-radius: 6px;
+      padding: 4px 10px;
+      justify-content: space-between;
+    }
+    .stake-input-row span { font-size: 12px; color: #9ca3af; font-weight: 700; }
+    .stake-input-row input {
+      background: transparent;
+      border: none;
+      color: #ffd000;
+      font-weight: 900;
+      font-size: 15px;
+      text-align: right;
+      width: 120px;
+      outline: none;
+    }
+    .stake-presets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    .stake-presets button {
+      background: #262b33;
+      border: 1px solid #383f4b;
+      color: #d1d5db;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .stake-presets button:hover { border-color: #ffd000; color: #fff; }
+
+    /* Bottom Dual Action Buttons (Rebet + Next Spin) */
+    .cabinet-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 54px;
+    }
+    .btn-rebet {
+      background: var(--gold-btn);
+      color: #ffffff;
+      border: none;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-rebet:hover:not(:disabled) { background: var(--gold-btn-hover); }
+    .btn-next-spin {
+      background: var(--green-btn);
+      color: #ffffff;
+      border: none;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-next-spin:hover:not(:disabled) { background: var(--green-btn-hover); }
+    .btn-rebet:disabled, .btn-next-spin:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* Live Naija Feed */
+    .feed-box {
+      width: 100%;
+      max-width: 780px;
+      background: rgba(24, 28, 34, 0.92);
+      border: 1px solid #2e343f;
+      border-radius: 12px;
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+    .feed-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; font-weight: 800; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; color: #9ca3af; padding: 8px 10px; border-bottom: 1px solid #2e343f; }
+    td { padding: 10px; border-bottom: 1px solid rgba(46, 52, 63, 0.5); font-weight: 600; }
+    .blur-mask { filter: blur(3px); user-select: none; opacity: 0.8; display: inline-block; padding: 0 2px; }
+    .win-ngn { color: #00e676; font-weight: 800; }
+
+    /* Modals */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: #1f242c; border: 1px solid #374151; border-radius: 10px; width: 100%; max-width: 380px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; }
+    .modal input { background: #111317; border: 1px solid #374151; color: #fff; padding: 11px; border-radius: 6px; font-size: 14px; width: 100%; }
+    .modal-submit { background: var(--green-btn); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 800; font-size: 14px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="felt-decor"></div>
+
+  <!-- SportyBet Crimson Header -->
+  <header class="sporty-navbar">
+    <div class="nav-left">
+      <div class="sporty-logo">SportyBet</div>
+      <div class="nav-links">
+        <span>Sports</span>
+        <span class="active">Games</span>
+        <span>Live Betting</span>
+        <span>Instant Football</span>
+        <span>Jackpot</span>
+        <span>Promotions</span>
+        <span>App<span class="hot-tag">HOT</span></span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="top-bal" onclick="fetchBalance()" title="Refresh Balance">
+        NGN <span id="topBalance">0.00</span> ↻
+      </div>
+      <button class="top-link" onclick="openModal('depositModal')">Deposit</button>
+      <div id="guestActions" style="display:flex; gap:8px;">
+        <button class="top-link" onclick="openModal('loginModal')">Login</button>
+        <button class="top-link" style="background:#ffd000; color:#000;" onclick="openModal('registerModal')">Register</button>
+      </div>
+      <div id="userActions" style="display:none; align-items:center; gap:8px;">
+        <span id="navUsername" style="font-size:12px;">My Account</span>
+        <button class="top-link" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Stage -->
+  <main class="stage-container">
+    <div class="cabinet">
+      <div class="cabinet-top">
+        <span style="color:#9ca3af; cursor:pointer;">❮</span>
+        <span class="cabinet-title">Spin Match</span>
+        <div class="cabinet-icons">
+          <span>🟢</span>
+          <span style="color:#d1d5db;">☰</span>
+        </div>
+      </div>
+
+      <div class="cabinet-balance-bar">
+        <span>💳 NGN <span id="cabinetBalance">0.00</span></span>
+      </div>
+
+      <!-- Dual Opposing Half-Wheels -->
+      <div class="dual-wheel-arena">
+        <div class="wheel-half-wrap wheel-left-wrap">
+          <svg class="wheel-disc" id="leftWheelSvg" viewBox="0 0 240 240"></svg>
+        </div>
+
+        <div class="center-bridge">
+          <div class="bridge-needle-left"></div>
+          <div class="bridge-bar"></div>
+          <div class="bridge-hub"></div>
+          <div class="bridge-needle-right"></div>
+        </div>
+
+        <div class="wheel-half-wrap wheel-right-wrap">
+          <svg class="wheel-disc" id="rightWheelSvg" viewBox="0 0 240 240"></svg>
+        </div>
+      </div>
+
+      <!-- 6 Multiplier Badges with Crown -->
+      <div class="chips-row">
+        <div class="mult-chip" id="chip-2" style="color:#9ca3af;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x2</span>
+          <div class="chip-circle">2</div>
+        </div>
+        <div class="mult-chip" id="chip-4" style="color:#38bdf8;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x4</span>
+          <div class="chip-circle">4</div>
+        </div>
+        <div class="mult-chip" id="chip-6" style="color:#facc15;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x6</span>
+          <div class="chip-circle">6</div>
+        </div>
+        <div class="mult-chip" id="chip-15" style="color:#fb923c;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x15</span>
+          <div class="chip-circle">15</div>
+        </div>
+        <div class="mult-chip" id="chip-24" style="color:#4ade80;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x24</span>
+          <div class="chip-circle">24</div>
+        </div>
+        <div class="mult-chip" id="chip-54" style="color:#f472b6;">
+          <span class="crown-icon">👑</span>
+          <span class="chip-val">x54</span>
+          <div class="chip-circle">54</div>
+        </div>
+      </div>
+
+      <!-- Win Banner -->
+      <div class="win-banner" id="winBanner">
+        Match Left & Right Symbols to Win up to 54×!
+      </div>
+
+      <!-- Stake Controls -->
+      <div class="stake-bar">
+        <div class="stake-input-row">
+          <span>STAKE (NGN)</span>
+          <input type="number" id="betInput" value="100" min="50" step="50" />
+        </div>
+        <div class="stake-presets">
+          <button onclick="setStake(100)">₦100</button>
+          <button onclick="setStake(500)">₦500</button>
+          <button onclick="setStake(1000)">₦1,000</button>
+          <button onclick="setStake(2500)">₦2,500</button>
+          <button onclick="setStake(5000)">₦5,000</button>
+        </div>
+      </div>
+
+      <!-- Rebet & Next Spin Buttons -->
+      <div class="cabinet-actions">
+        <button class="btn-rebet" id="rebetBtn" onclick="executeSpin(true)">Rebet</button>
+        <button class="btn-next-spin" id="spinBtn" onclick="executeSpin(false)">Next Spin</button>
+      </div>
+    </div>
+
+    <!-- Live Nigerian Winners Feed -->
+    <div class="feed-box">
+      <div class="feed-head">
+        <span>🟢 Live Spin Match Winners (Nigeria)</span>
+        <span style="color:#9ca3af; font-size:11px;">Privacy Protected</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Phone</th>
+            <th>Stake</th>
+            <th>Hit</th>
+            <th>Payout</th>
+          </tr>
+        </thead>
+        <tbody id="naijaFeedBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Register Modal -->
+  <div class="modal-backdrop" id="registerModal">
+    <div class="modal">
+      <div class="modal-head"><span>Register (NGN 50,000 Bonus)</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <input type="text" id="regUser" placeholder="Username (e.g. Chinedu_NG)" />
+      <input type="password" id="regPass" placeholder="Password" />
+      <button class="modal-submit" onclick="registerUser()">Create Account</button>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal-backdrop" id="loginModal">
+    <div class="modal">
+      <div class="modal-head"><span>Sign In to SportyBet Spin Match</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <input type="text" id="loginUser" placeholder="Username" />
+      <input type="password" id="loginPass" placeholder="Password" />
+      <button class="modal-submit" onclick="loginUser()">Login</button>
+    </div>
+  </div>
+
+  <!-- Deposit Modal -->
+  <div class="modal-backdrop" id="depositModal">
+    <div class="modal">
+      <div class="modal-head"><span>Instant NGN Deposit</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <input type="number" id="depositAmount" value="5000" min="100" placeholder="Amount in NGN" />
+      <button class="modal-submit" onclick="depositFunds()">Top Up NGN Balance</button>
+    </div>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('casino_token') || '';
+    let username = localStorage.getItem('casino_user') || '';
+    let lastStake = 100;
+    let leftRot = 0;
+    let rightRot = 0;
+
+    // 10-wedge layout matching SportyBet Spin Match colors & labels
+    const wheelWedges = [
+      { label: 'x6',   bg: '#f5b82e', fg: '#111827' },
+      { label: 'x15',  bg: '#f59e0b', fg: '#111827' },
+      { label: 'x4',   bg: '#38bdf8', fg: '#111827' },
+      { label: 'x2',   bg: '#64748b', fg: '#ffffff' },
+      { label: 'Wild', bg: '#1f242d', fg: '#ffffff' },
+      { label: 'x54',  bg: '#f472b6', fg: '#111827' },
+      { label: 'x4',   bg: '#38bdf8', fg: '#111827' },
+      { label: 'x15',  bg: '#f59e0b', fg: '#111827' },
+      { label: 'x6',   bg: '#f5b82e', fg: '#111827' },
+      { label: 'x24',  bg: '#4ade80', fg: '#111827' }
+    ];
+
+    function fmtNGN(val) {
+      return Number(val || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function drawWheel(svgId, isLeft) {
+      const svg = document.getElementById(svgId);
+      svg.innerHTML = '';
+      const cx = 120, cy = 120, r = 112;
+      const slice = 360 / wheelWedges.length;
+
+      // Outer metallic bezel
+      const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      outer.setAttribute('cx', cx);
+      outer.setAttribute('cy', cy);
+      outer.setAttribute('r', 118);
+      outer.setAttribute('fill', '#111317');
+      outer.setAttribute('stroke', '#9ca3af');
+      outer.setAttribute('stroke-width', '4');
+      svg.appendChild(outer);
+
+      wheelWedges.forEach((w, i) => {
+        const start = i * slice;
+        const end = start + slice;
+        const x1 = cx + r * Math.cos(Math.PI * (start - 90) / 180);
+        const y1 = cy + r * Math.sin(Math.PI * (start - 90) / 180);
+        const x2 = cx + r * Math.cos(Math.PI * (end - 90) / 180);
+        const y2 = cy + r * Math.sin(Math.PI * (end - 90) / 180);
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`);
+        path.setAttribute('fill', w.bg);
+        path.setAttribute('stroke', '#111317');
+        path.setAttribute('stroke-width', '2');
+        svg.appendChild(path);
+
+        const mid = start + slice / 2;
+        const tx = cx + 78 * Math.cos(Math.PI * (mid - 90) / 180);
+        const ty = cy + 78 * Math.sin(Math.PI * (mid - 90) / 180);
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', tx);
+        txt.setAttribute('y', ty);
+        txt.setAttribute('fill', w.fg);
+        txt.setAttribute('font-size', '14');
+        txt.setAttribute('font-weight', '900');
+        txt.setAttribute('text-anchor', 'middle');
+        txt.setAttribute('dominant-baseline', 'middle');
+        // Orient text cleanly toward the center bridge
+        const textRot = isLeft ? mid - 90 : mid + 90;
+        txt.setAttribute('transform', `rotate(${textRot}, ${tx}, ${ty})`);
+        txt.textContent = w.label;
+        svg.appendChild(txt);
+      });
+
+      // Center cap
+      const hub = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      hub.setAttribute('cx', cx);
+      hub.setAttribute('cy', cy);
+      hub.setAttribute('r', 26);
+      hub.setAttribute('fill', '#1f242d');
+      hub.setAttribute('stroke', '#6b7280');
+      hub.setAttribute('stroke-width', '3');
+      svg.appendChild(hub);
+    }
+
+    function computeWheelAngle(symbolLabel, pointerDeg, currentAngle) {
+      const matches = wheelWedges
+        .map((w, i) => (w.label === symbolLabel ? i : -1))
+        .filter(i => i !== -1);
+      const idx = matches.length ? matches[Math.floor(Math.random() * matches.length)] : 0;
+      const slice = 360 / wheelWedges.length;
+      const wedgeCenter = (idx + 0.5) * slice;
+      const targetMod = (pointerDeg - wedgeCenter + 360) % 360;
+      const curMod = ((currentAngle % 360) + 360) % 360;
+      const delta = (targetMod - curMod + 360) % 360;
+      return currentAngle + (360 * 6) + delta;
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open')); }
+    function setStake(val) { document.getElementById('betInput').value = val; }
+
+    function syncAuthUI() {
+      if (token) {
+        document.getElementById('guestActions').style.display = 'none';
+        document.getElementById('userActions').style.display = 'flex';
+        document.getElementById('navUsername').textContent = username;
+        fetchBalance();
+      } else {
+        document.getElementById('guestActions').style.display = 'flex';
+        document.getElementById('userActions').style.display = 'none';
+        document.getElementById('topBalance').textContent = '0.00';
+        document.getElementById('cabinetBalance').textContent = '0.00';
+      }
+    }
+
+    async function registerUser() {
+      const u = document.getElementById('regUser').value;
+      const p = document.getElementById('regPass').value;
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        token = data.token;
+        username = data.username || u;
+        localStorage.setItem('casino_token', token);
+        localStorage.setItem('casino_user', username);
+        closeModals();
+        syncAuthUI();
+        document.getElementById('winBanner').innerHTML = `Welcome! <span class="gold-amount">NGN ${fmtNGN(data.balance)}</span> Credited`;
+      } else {
+        alert(data.error || 'Registration failed');
+      }
+    }
+
+    async function loginUser() {
+      const u = document.getElementById('loginUser').value;
+      const p = document.getElementById('loginPass').value;
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        token = data.token;
+        username = data.username || u;
+        localStorage.setItem('casino_token', token);
+        localStorage.setItem('casino_user', username);
+        closeModals();
+        syncAuthUI();
+      } else {
+        alert(data.error || 'Login failed');
+      }
+    }
+
+    function logout() {
+      token = '';
+      username = '';
+      localStorage.removeItem('casino_token');
+      localStorage.removeItem('casino_user');
+      syncAuthUI();
+    }
+
+    async function fetchBalance() {
+      if (!token) return;
+      const res = await fetch('/api/balance', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        document.getElementById('topBalance').textContent = fmtNGN(data.balance);
+        document.getElementById('cabinetBalance').textContent = fmtNGN(data.balance);
+      } else {
+        logout();
+      }
+    }
+
+    async function depositFunds() {
+      if (!token) return openModal('loginModal');
+      const amount = parseFloat(document.getElementById('depositAmount').value);
+      const res = await fetch('/api/deposit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ amount })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.payment_url) {
+          window.open(data.payment_url, '_blank');
+        } else {
+          document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
+          document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
+          closeModals();
+          document.getElementById('winBanner').innerHTML = `Deposit Success: <span class="gold-amount">+NGN ${fmtNGN(amount)}</span>`;
+        }
+      } else {
+        alert(data.error || 'Deposit failed');
+      }
+    }
+
+    async function executeSpin(isRebet) {
+      if (!token) return openModal('loginModal');
+      const bet = isRebet ? lastStake : parseFloat(document.getElementById('betInput').value);
+      if (isNaN(bet) || bet <= 0) return alert('Enter a valid stake');
+      lastStake = bet;
+      document.getElementById('betInput').value = bet;
+
+      const spinBtn = document.getElementById('spinBtn');
+      const rebetBtn = document.getElementById('rebetBtn');
+      spinBtn.disabled = true;
+      rebetBtn.disabled = true;
+
+      document.querySelectorAll('.mult-chip').forEach(c => c.classList.remove('active-hit'));
+      document.getElementById('winBanner').textContent = 'Spinning Both Wheels...';
+
+      const res = await fetch('/api/spin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ bet })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        spinBtn.disabled = false;
+        rebetBtn.disabled = false;
+        document.getElementById('winBanner').textContent = data.error || 'Spin failed';
+        return;
+      }
+
+      // Left wheel pointer sits at 90 deg (3 o'clock); Right wheel pointer sits at 270 deg (9 o'clock)
+      leftRot = computeWheelAngle(data.leftSymbol, 90, leftRot);
+      rightRot = computeWheelAngle(data.rightSymbol, 270, rightRot);
+
+      document.getElementById('leftWheelSvg').style.transform = `rotate(${leftRot}deg)`;
+      document.getElementById('rightWheelSvg').style.transform = `rotate(${rightRot}deg)`;
+
+      setTimeout(() => {
+        spinBtn.disabled = false;
+        rebetBtn.disabled = false;
+        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
+        document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
+
+        if (data.multiplier > 0) {
+          const activeChip = document.getElementById(`chip-${data.multiplier}`);
+          if (activeChip) activeChip.classList.add('active-hit');
+          document.getElementById('winBanner').innerHTML = `You Won 🏆 <span class="gold-amount">NGN ${fmtNGN(data.winAmount)}</span>`;
+        } else {
+          document.getElementById('winBanner').textContent = `${data.leftSymbol} vs ${data.rightSymbol} — No Match. Try Again!`;
+        }
+
+        const maskedName = username.length > 3
+          ? `${username.slice(0, 3)}<span class="blur-mask">${username.slice(3)}</span>`
+          : username;
+        addFeedRow(maskedName, `0803<span class="blur-mask">7492</span>NGN`, bet, data.multiplier > 0 ? `x${data.multiplier}` : '—', data.winAmount);
+      }, 3250);
+    }
+
+    const naijaPlayers = [
+      { first: 'Chinedu', last: 'Okafor',   p1: '0803', p2: '7492', p3: '819', bet: 100,  mult: 54 },
+      { first: 'Amina',   last: 'Bello',    p1: '0814', p2: '3301', p3: '402', bet: 500,  mult: 6 },
+      { first: 'Tunde',   last: 'Adeyemi',  p1: '0706', p2: '8821', p3: '915', bet: 1000, mult: 4 },
+      { first: 'Ngozi',   last: 'Eze',      p1: '0902', p2: '5190', p3: '673', bet: 250,  mult: 24 },
+      { first: 'Ibrahim', last: 'Musa',     p1: '0809', p2: '6412', p3: '128', bet: 2000, mult: 2 },
+      { first: 'Funke',   last: 'Balogun',  p1: '0905', p2: '4718', p3: '894', bet: 500,  mult: 15 }
+    ];
+
+    function addFeedRow(nameHtml, phoneHtml, stake, hit, payout) {
+      const tbody = document.getElementById('naijaFeedBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${nameHtml}</td>
+        <td style="font-family:monospace; color:#9ca3af;">${phoneHtml}</td>
+        <td>NGN ${fmtNGN(stake)}</td>
+        <td style="color:#ffd000; font-weight:800;">${hit}</td>
+        <td class="${payout > 0 ? 'win-ngn' : ''}">NGN ${fmtNGN(payout)}</td>
+      `;
+      tbody.insertBefore(tr, tbody.firstChild);
+      if (tbody.children.length > 8) tbody.removeChild(tbody.lastChild);
+    }
+
+    function initFeed() {
+      naijaPlayers.forEach(p => {
+        addFeedRow(
+          `${p.first} <span class="blur-mask">${p.last}</span>`,
+          `${p.p1}<span class="blur-mask">${p.p2}</span>${p.p3}`,
+          p.bet,
+          `x${p.mult}`,
+          p.bet * p.mult
+        );
+      });
+    }
+
+    drawWheel('leftWheelSvg', true);
+    drawWheel('rightWheelSvg', false);
+    initFeed();
+    syncAuthUI();
+  </script>
+</body>
+</html>

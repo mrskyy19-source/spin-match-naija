@@ -13,12 +13,69 @@ const rateLimit = require('express-rate-limit');
 const User = require('./models/User');
 
 const app = express();
-
-// Required for Render / cloud reverse proxies
 app.set('trust proxy', 1);
 
 // ==========================================
-// 1. MIDDLEWARE & SECURITY
+// 1. TRANSACTION LEDGER MODEL (IDEMPOTENCY)
+// ==========================================
+const transactionSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    reference: { type: String, unique: true, required: true },
+    type: { type: String, enum: ['deposit', 'withdrawal'], required: true },
+    gateway: { type: String, default: 'paystack' },
+    amountNGN: { type: Number, required: true },
+    status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
+    meta: { type: Object, default: {} },
+    createdAt: { type: Date, default: Date.now }
+});
+const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);
+
+// ==========================================
+// 2. PAYSTACK WEBHOOK (MUST BE BEFORE express.json)
+// ==========================================
+app.post('/api/webhook/paystack', express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+        const secret = process.env.PAYSTACK_SECRET_KEY;
+        const signature = req.headers['x-paystack-signature'];
+        if (!secret || !signature) return res.sendStatus(401);
+
+        const expectedHash = crypto.createHmac('sha512', secret).update(req.body).digest('hex');
+        const sigBuf = Buffer.from(signature, 'utf8');
+        const expBuf = Buffer.from(expectedHash, 'utf8');
+        if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+            return res.status(401).send('Invalid Paystack signature');
+        }
+
+        const event = JSON.parse(req.body.toString('utf8'));
+        if (event.event === 'charge.success') {
+            const { reference, amount, metadata } = event.data;
+            const amountNGN = parseFloat((amount / 100).toFixed(2)); // Kobo to NGN
+
+            const existingTx = await Transaction.findOne({ reference });
+            if (existingTx && existingTx.status === 'completed') {
+                return res.sendStatus(200); // Already credited
+            }
+
+            const userId = (existingTx && existingTx.userId) || (metadata && metadata.userId);
+            if (userId && amountNGN > 0) {
+                await Transaction.findOneAndUpdate(
+                    { reference },
+                    { userId, reference, type: 'deposit', gateway: 'paystack', amountNGN, status: 'completed' },
+                    { upsert: true, new: true }
+                );
+                await User.findByIdAndUpdate(userId, { $inc: { balance: amountNGN } });
+                console.log(`🟢 [PAYSTACK WEBHOOK] Credited NGN ${amountNGN} (Ref: ${reference})`);
+            }
+        }
+        res.sendStatus(200);
+    } catch (err) {
+        console.error('🔴 [PAYSTACK WEBHOOK ERROR]:', err.message);
+        res.sendStatus(500);
+    }
+});
+
+// ==========================================
+// 3. STANDARD MIDDLEWARE & SECURITY
 // ==========================================
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: '*', credentials: true }));
@@ -36,16 +93,13 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 
 // ==========================================
-// 2. DATABASE CONNECTION
+// 4. DATABASE & AUTH
 // ==========================================
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/casino';
 mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 })
     .then(() => console.log("🟢 [DB] MongoDB Connected Successfully"))
     .catch(err => console.error("🔴 [DB] Connection Error:", err.message));
 
-// ==========================================
-// 3. AUTHENTICATION MIDDLEWARE
-// ==========================================
 const JWT_SECRET = process.env.JWT_SECRET || 'elite_spin_naija_secret_2026';
 
 const authenticateToken = (req, res, next) => {
@@ -61,10 +115,9 @@ const authenticateToken = (req, res, next) => {
 };
 
 // ==========================================
-// 4. SPIN MATCH DUAL-WHEEL ENGINE
+// 5. SPIN MATCH DUAL-WHEEL ENGINE
 // ==========================================
 const wheelSymbols = ['x2', 'x4', 'x6', 'x15', 'x24', 'x54', 'Wild'];
-
 const matchOutcomes = [
     { label: "NO MATCH", multiplier: 0,  weight: 5600 },
     { label: "x2 MATCH", multiplier: 2,  weight: 2200 },
@@ -77,7 +130,6 @@ const matchOutcomes = [
 
 function generateSpinMatch(user) {
     let selected;
-
     if (user.winRateOverride !== null && user.winRateOverride !== undefined) {
         selected = Math.random() < user.winRateOverride
             ? matchOutcomes[matchOutcomes.length - 1]
@@ -86,31 +138,23 @@ function generateSpinMatch(user) {
         const totalWeight = matchOutcomes.reduce((sum, item) => sum + item.weight, 0);
         const secureHex = crypto.randomBytes(4).toString('hex');
         let randomNum = parseInt(secureHex, 16) % totalWeight;
-
         for (const item of matchOutcomes) {
-            if (randomNum < item.weight) {
-                selected = item;
-                break;
-            }
+            if (randomNum < item.weight) { selected = item; break; }
             randomNum -= item.weight;
         }
     }
 
     if (selected.multiplier > 0) {
         const targetSym = `x${selected.multiplier}`;
-        // Either exact symbol match or Wild + target symbol
         const useWild = crypto.randomInt(0, 4) === 0;
-        const leftSymbol = useWild ? 'Wild' : targetSym;
-        const rightSymbol = targetSym;
         return {
             matched: true,
-            leftSymbol,
-            rightSymbol,
+            leftSymbol: useWild ? 'Wild' : targetSym,
+            rightSymbol: targetSym,
             multiplier: selected.multiplier,
             label: selected.label
         };
     } else {
-        // Pick two non-matching symbols (never double Wild)
         const nonWild = wheelSymbols.filter(s => s !== 'Wild');
         const leftIdx = crypto.randomInt(0, nonWild.length);
         let rightIdx = crypto.randomInt(0, nonWild.length - 1);
@@ -126,7 +170,7 @@ function generateSpinMatch(user) {
 }
 
 // ==========================================
-// 5. API ROUTES
+// 6. USER & GAME ROUTES
 // ==========================================
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
@@ -136,14 +180,8 @@ app.post('/api/register', async (req, res) => {
         if (!username || !password || password.length < 4) {
             return res.status(400).json({ error: "Username and password (min 4 chars) required" });
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({
-            username: username.trim(),
-            password: hashedPassword,
-            balance: 50000 // NGN 50,000 welcome balance
-        });
-
+        const user = new User({ username: username.trim(), password: hashedPassword, balance: 50000 });
         await user.save();
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
         res.status(201).json({ message: "Account created", token, balance: user.balance, username: user.username });
@@ -159,7 +197,6 @@ app.post('/api/login', async (req, res) => {
         if (!user || !(await bcrypt.compare(password || '', user.password))) {
             return res.status(401).json({ error: "Invalid username or password" });
         }
-
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, balance: user.balance, username: user.username });
     } catch (e) {
@@ -180,9 +217,7 @@ app.get('/api/balance', authenticateToken, async (req, res) => {
 app.post('/api/spin', authenticateToken, async (req, res) => {
     try {
         const parsedBet = parseFloat(req.body.bet);
-        if (isNaN(parsedBet) || parsedBet <= 0) {
-            return res.status(400).json({ error: "Invalid stake amount" });
-        }
+        if (isNaN(parsedBet) || parsedBet <= 0) return res.status(400).json({ error: "Invalid stake amount" });
 
         const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -196,7 +231,6 @@ app.post('/api/spin', authenticateToken, async (req, res) => {
             { $inc: { balance: winAmount - parsedBet } },
             { new: true }
         );
-
         if (!updatedUser) return res.status(400).json({ error: "Transaction conflict, try again" });
 
         res.json({
@@ -213,60 +247,166 @@ app.post('/api/spin', authenticateToken, async (req, res) => {
     }
 });
 
-// Fixed Deposit Route: Uses NOWPayments if API key is configured, otherwise credits instant NGN top-up
+// ==========================================
+// 7. PAYMENTS: PAYSTACK NGN, DEMO TOP-UP & WITHDRAWALS
+// ==========================================
 app.post('/api/deposit', authenticateToken, async (req, res) => {
     const amount = parseFloat(req.body.amount);
+    const email = (req.body.email || '').trim();
+    const mode = req.body.mode || 'paystack';
+
     if (isNaN(amount) || amount < 100) {
         return res.status(400).json({ error: "Minimum deposit is NGN 100.00" });
     }
 
     try {
-        if (process.env.NOWPAYMENTS_API_KEY && process.env.NOWPAYMENTS_API_KEY.trim() !== '') {
-            const response = await axios.post('https://api.nowpayments.io/v1/payment', {
-                price_amount: amount,
-                price_currency: 'ngn',
-                pay_currency: 'usdttrc20',
-                order_id: req.user.userId,
-                order_description: "Spin Match NGN Deposit"
-            }, {
-                headers: { 'x-api-key': process.env.NOWPAYMENTS_API_KEY }
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // 1. Live / Test Paystack Checkout (Card, Bank Transfer, USSD)
+        if (mode === 'paystack' && process.env.PAYSTACK_SECRET_KEY && process.env.PAYSTACK_SECRET_KEY.trim() !== '') {
+            const reference = `SMN_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+            const customerEmail = email || `${user.username.toLowerCase().replace(/[^a-z0-9]/g, '')}@spinmatch.ng`;
+            const callbackUrl = `${req.protocol}://${req.get('host')}/`;
+
+            await Transaction.create({
+                userId: user._id,
+                reference,
+                type: 'deposit',
+                gateway: 'paystack',
+                amountNGN: amount,
+                status: 'pending'
             });
-            return res.json({ payment_url: response.data.invoice_url, payment_id: response.data.payment_id });
+
+            const response = await axios.post('https://api.paystack.co/transaction/initialize', {
+                email: customerEmail,
+                amount: Math.round(amount * 100), // Convert NGN to Kobo
+                currency: 'NGN',
+                reference,
+                callback_url: callbackUrl,
+                metadata: { userId: user._id.toString(), username: user.username }
+            }, {
+                headers: {
+                    Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY.trim()}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return res.json({
+                payment_url: response.data.data.authorization_url,
+                reference
+            });
         }
 
-        // Instant NGN Sandbox / Local Top-Up when no external gateway key is set
+        // 2. Instant Sandbox / Demo NGN Top-Up (Active when PAYSTACK_SECRET_KEY is not configured)
+        const ref = `DEMO_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+        await Transaction.create({
+            userId: user._id,
+            reference: ref,
+            type: 'deposit',
+            gateway: 'instant_demo',
+            amountNGN: amount,
+            status: 'completed'
+        });
+
         const updatedUser = await User.findByIdAndUpdate(
-            req.user.userId,
+            user._id,
             { $inc: { balance: amount } },
             { new: true }
         );
+
         return res.json({
             instant: true,
             newBalance: updatedUser.balance,
-            message: `NGN ${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })} credited instantly!`
+            reference: ref,
+            message: `NGN ${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })} credited!`
         });
-    } catch (e) {
-        res.status(500).json({ error: "Deposit processing failed" });
+    } catch (err) {
+        console.error('🔴 [DEPOSIT ERROR]:', err.response?.data || err.message);
+        res.status(500).json({ error: err.response?.data?.message || "Payment initialization failed" });
     }
 });
 
-app.post('/api/webhook/nowpayments', async (req, res) => {
+// Verify Paystack Redirect Callback Idempotently
+app.get('/api/deposit/verify/:reference', authenticateToken, async (req, res) => {
     try {
-        const sig = req.headers['x-nowpayments-sig'];
-        if (!sig) return res.status(400).json({ error: "Missing signature" });
+        const { reference } = req.params;
+        const tx = await Transaction.findOne({ reference, userId: req.user.userId });
+        if (!tx) return res.status(404).json({ error: "Transaction reference not found" });
 
-        const hmac = crypto.createHmac('sha512', process.env.NOWPAYMENTS_IPN_SECRET || '');
-        hmac.update(JSON.stringify(req.body));
-        if (hmac.digest('hex') !== sig) return res.status(403).json({ error: "Invalid signature" });
-
-        const { payment_status, order_id, price_amount } = req.body;
-        if (payment_status === 'finished') {
-            await User.findByIdAndUpdate(order_id, { $inc: { balance: parseFloat(price_amount) } });
+        if (tx.status === 'completed') {
+            const user = await User.findById(req.user.userId);
+            return res.json({ status: 'completed', amountNGN: tx.amountNGN, newBalance: user.balance });
         }
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).send("Webhook Error");
+
+        const response = await axios.get(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
+            headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY.trim()}` }
+        });
+
+        if (response.data.data.status === 'success') {
+            const verifiedNGN = parseFloat((response.data.data.amount / 100).toFixed(2));
+            tx.status = 'completed';
+            tx.amountNGN = verifiedNGN;
+            await tx.save();
+
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user.userId,
+                { $inc: { balance: verifiedNGN } },
+                { new: true }
+            );
+            return res.json({ status: 'completed', amountNGN: verifiedNGN, newBalance: updatedUser.balance });
+        }
+
+        res.json({ status: response.data.data.status });
+    } catch (err) {
+        res.status(500).json({ error: "Could not verify payment" });
     }
+});
+
+// Withdraw NGN to Nigerian Bank Account
+app.post('/api/withdraw', authenticateToken, async (req, res) => {
+    try {
+        const amount = parseFloat(req.body.amount);
+        const { bankName, accountNumber, accountName } = req.body;
+
+        if (isNaN(amount) || amount < 1000) {
+            return res.status(400).json({ error: "Minimum withdrawal is NGN 1,000.00" });
+        }
+        if (!bankName || !accountNumber || accountNumber.length !== 10) {
+            return res.status(400).json({ error: "Enter a valid 10-digit Nigerian NUBAN account number" });
+        }
+
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: req.user.userId, balance: { $gte: amount } },
+            { $inc: { balance: -amount } },
+            { new: true }
+        );
+        if (!updatedUser) return res.status(400).json({ error: "Insufficient NGN balance for withdrawal" });
+
+        const reference = `WDR_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
+        await Transaction.create({
+            userId: req.user.userId,
+            reference,
+            type: 'withdrawal',
+            gateway: 'nip_bank_transfer',
+            amountNGN: amount,
+            status: 'completed',
+            meta: { bankName, accountNumber, accountName }
+        });
+
+        res.json({
+            message: `NGN ${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })} payout queued to ${bankName} (${accountNumber})`,
+            reference,
+            newBalance: updatedUser.balance
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Withdrawal failed" });
+    }
+});
+
+app.get('/api/transactions', authenticateToken, async (req, res) => {
+    const list = await Transaction.find({ userId: req.user.userId }).sort({ createdAt: -1 }).limit(10);
+    res.json({ transactions: list });
 });
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public/index.html')));
@@ -275,5 +415,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`========================================`);
     console.log(`🚀 SPIN MATCH NAIJA LIVE on port ${PORT}`);
+    console.log(`💳 Paystack Gateway: ${process.env.PAYSTACK_SECRET_KEY ? 'LIVE/TEST KEY LOADED' : 'SANDBOX INSTANT MODE'}`);
     console.log(`========================================`);
 });

@@ -3,294 +3,403 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spin Match — SportyBet Nigeria Games</title>
+  <title>PLUGBET — Spin Match | Nigeria's #1 Instant Games</title>
   <style>
     :root {
-      --sporty-red: #e41827;
-      --cabinet-bg: #1c1f24;
-      --cabinet-header: #252930;
+      --plug-red: #e41827;
+      --plug-red-dark: #b60f1c;
+      --cabinet-bg: #181c22;
+      --cabinet-top: #232831;
       --gold-btn: #b5a624;
-      --gold-btn-hover: #c9b92c;
+      --gold-btn-hover: #cab92c;
       --green-btn: #00b843;
-      --green-btn-hover: #00d14c;
-      --text-light: #ffffff;
+      --green-btn-hover: #00d44e;
+      --text-main: #ffffff;
       --text-muted: #9ca3af;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     body {
-      background: radial-gradient(circle at 50% 35%, #1c3b27 0%, #0d1c12 75%, #08110b 100%);
-      color: var(--text-light);
+      background: radial-gradient(circle at 50% 30%, #1c3d28 0%, #0d1d13 72%, #07100a 100%);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
-      position: relative;
     }
-    .felt-decor {
-      position: fixed; inset: 0; pointer-events: none; opacity: 0.08; z-index: 0;
+    .felt-grid {
+      position: fixed; inset: 0; pointer-events: none; opacity: 0.06; z-index: 0;
       background-image: radial-gradient(#ffffff 1px, transparent 1px);
-      background-size: 40px 40px;
+      background-size: 36px 36px;
     }
 
-    /* Top SportyBet Red Ribbon */
-    .sporty-navbar {
-      background: var(--sporty-red);
-      height: 52px;
+    /* PLUGBET Top Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #d81423 0%, #e41827 50%, #c7121f 100%);
+      height: 54px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
       position: sticky;
       top: 0;
-      z-index: 50;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+      z-index: 60;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.45);
     }
-    .nav-left { display: flex; align-items: center; gap: 18px; overflow-x: auto; }
-    .sporty-logo { font-weight: 900; font-size: 20px; font-style: italic; letter-spacing: -0.5px; color: #fff; }
-    .nav-links { display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 700; white-space: nowrap; }
-    .nav-links span { cursor: pointer; opacity: 0.92; padding: 6px 10px; border-radius: 4px; }
-    .nav-links span.active { background: #ffffff; color: var(--sporty-red); font-weight: 800; }
-    .hot-tag { background: #ffd000; color: #000; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; vertical-align: super; margin-left: 2px; }
+    .nav-left { display: flex; align-items: center; gap: 20px; overflow-x: auto; }
+    .brand-logo {
+      font-weight: 900; font-size: 21px; font-style: italic; letter-spacing: 0.4px;
+      display: flex; align-items: center; gap: 6px; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .brand-bolt { background: #ffd000; color: #000; font-style: normal; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+    .nav-links { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .nav-links span { cursor: pointer; opacity: 0.9; padding: 6px 10px; border-radius: 4px; transition: 0.15s; }
+    .nav-links span:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+    .nav-links span.active { background: #fff; color: var(--plug-red); font-weight: 800; }
+    .hot-badge { background: #ffd000; color: #000; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; vertical-align: super; margin-left: 2px; }
 
     .nav-right { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; white-space: nowrap; }
-    .top-bal { color: #ffd000; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    .top-link { cursor: pointer; color: #fff; background: rgba(0,0,0,0.22); padding: 6px 12px; border-radius: 4px; border: none; font-weight: 700; font-size: 12px; }
-    .top-link:hover { background: rgba(0,0,0,0.36); }
-
-    /* Center Stage & Cabinet */
-    .stage-container {
-      position: relative; z-index: 5; max-width: 980px; width: 100%; margin: 24px auto;
-      padding: 0 16px; display: flex; flex-direction: column; align-items: center; gap: 24px;
+    .top-balance {
+      background: rgba(0,0,0,0.25); padding: 6px 12px; border-radius: 6px;
+      color: #ffd000; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;
+      font-variant-numeric: tabular-nums;
     }
+    .nav-btn {
+      background: rgba(0,0,0,0.22); color: #fff; border: none; padding: 7px 12px;
+      border-radius: 5px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.15s;
+    }
+    .nav-btn:hover { background: rgba(0,0,0,0.38); }
+    .nav-btn.green { background: #00b843; }
+    .nav-btn.gold { background: #ffd000; color: #000; }
+
+    /* Main Stage */
+    .stage {
+      position: relative; z-index: 5; max-width: 960px; width: 100%; margin: 20px auto 40px;
+      padding: 0 14px; display: flex; flex-direction: column; align-items: center; gap: 22px;
+    }
+
+    /* Enterprise Spin Match Cabinet */
     .cabinet {
-      width: 100%; max-width: 440px;
-      background: linear-gradient(180deg, #23272e 0%, #15181d 100%);
-      border-radius: 12px; border: 2px solid #323741;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.75); overflow: hidden;
+      width: 100%; max-width: 450px;
+      background: linear-gradient(180deg, #222730 0%, #14171d 100%);
+      border-radius: 14px; border: 2px solid #323946;
+      box-shadow: 0 26px 64px rgba(0,0,0,0.78);
+      overflow: hidden; position: relative;
       display: flex; flex-direction: column;
     }
-    .cabinet-top {
-      background: var(--cabinet-header); padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #303540;
-    }
-    .cabinet-title { font-size: 16px; font-weight: 800; }
-    .cabinet-balance-bar {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 18px; background: rgba(0,0,0,0.28); font-size: 13px; font-weight: 800; color: #e5e7eb;
-    }
-    .mini-cashier-btn {
-      background: #00b843; color: #fff; border: none; padding: 4px 10px;
-      border-radius: 4px; font-size: 11px; font-weight: 800; cursor: pointer;
-    }
+    #confettiCanvas { position: absolute; inset: 0; pointer-events: none; z-index: 40; width: 100%; height: 100%; }
 
-    /* Dual Wheels */
-    .dual-wheel-arena {
-      position: relative; height: 280px; width: 100%;
-      background: radial-gradient(circle at center, #2c313a 0%, #16191e 85%);
+    .cabinet-header {
+      background: var(--cabinet-top); padding: 11px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #303642;
+    }
+    .cab-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .cab-tools { display: flex; align-items: center; gap: 8px; }
+    .tool-pill {
+      background: #14171d; border: 1px solid #353c49; color: #d1d5db;
+      padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .tool-pill.active { border-color: #ffd000; color: #ffd000; background: rgba(255,208,0,0.12); }
+
+    .cab-subbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; background: rgba(0,0,0,0.3); font-size: 12px; font-weight: 800;
+    }
+    .history-ribbon {
+      display: flex; align-items: center; gap: 5px; overflow-x: auto; padding: 6px 14px;
+      background: #111419; border-bottom: 1px solid #262b35; min-height: 32px;
+    }
+    .hist-pill {
+      font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+      background: #232831; color: #9ca3af;
+    }
+    .hist-pill.hit { background: rgba(0, 184, 67, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.35); }
+    .hist-pill.mega { background: rgba(244, 114, 182, 0.22); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.45); }
+
+    /* Dual Opposing Wheels */
+    .wheel-arena {
+      position: relative; height: 276px; width: 100%;
+      background: radial-gradient(circle at center, #2d3440 0%, #151920 85%);
       overflow: hidden; display: flex; align-items: center; justify-content: center;
-      border-top: 1px solid #2d323b; border-bottom: 1px solid #2d323b;
+      border-bottom: 1px solid #2d333f;
     }
-    .wheel-half-wrap { position: absolute; width: 270px; height: 270px; top: 5px; }
-    .wheel-left-wrap { left: -92px; }
-    .wheel-right-wrap { right: -92px; }
-    .wheel-disc {
+    .wheel-wrap { position: absolute; width: 266px; height: 266px; top: 5px; }
+    .wheel-left { left: -90px; }
+    .wheel-right { right: -90px; }
+    .wheel-svg {
       width: 100%; height: 100%; border-radius: 50%;
-      transition: transform 3.2s cubic-bezier(0.14, 0.86, 0.22, 1);
-      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.75));
+      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.8));
     }
 
-    .center-bridge {
-      position: relative; z-index: 20; width: 112px; height: 24px;
+    /* Metallic Center Bridge Pointer */
+    .bridge {
+      position: relative; z-index: 20; width: 114px; height: 26px;
       display: flex; align-items: center; justify-content: space-between; pointer-events: none;
     }
     .bridge-bar {
       position: absolute; left: 12px; right: 12px; height: 10px;
       background: linear-gradient(180deg, #f3f4f6 0%, #6b7280 50%, #d1d5db 100%);
-      border-radius: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.8);
+      border-radius: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.85);
     }
-    .bridge-needle-left { width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 18px solid #e5e7eb; z-index: 2; }
-    .bridge-needle-right { width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid #e5e7eb; z-index: 2; }
+    .needle-l { width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 18px solid #f3f4f6; z-index: 2; }
+    .needle-r { width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid #f3f4f6; z-index: 2; }
     .bridge-hub {
-      width: 28px; height: 28px; border-radius: 50%;
+      width: 28px; height: 28px; border-radius: 50%; margin: 0 auto; z-index: 3;
       background: radial-gradient(circle at 35% 35%, #ffffff, #6b7280 70%, #1f2937 100%);
-      border: 2px solid #d1d5db; margin: 0 auto; z-index: 3;
+      border: 2px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.85);
     }
 
-    /* 6 Multiplier Chips */
-    .chips-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 16px 18px 8px; }
-    .mult-chip {
-      background: #14171c; border: 1px solid #2e343f; border-radius: 8px; padding: 8px 4px;
-      display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; transition: 0.2s;
+    /* 6 Interactive Multiplier Betting Slots (Matches Screenshot 1 & 2) */
+    .slots-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px;
+      padding: 18px 14px 10px;
     }
-    .mult-chip .chip-val { font-size: 11px; font-weight: 800; color: #9ca3af; }
-    .mult-chip .chip-circle {
-      width: 24px; height: 24px; border-radius: 50%; border: 2px dashed currentColor;
-      display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900;
+    .bet-slot {
+      background: #13161c; border: 1.5px solid #2d3440; border-radius: 9px;
+      padding: 8px 3px 7px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+      position: relative; cursor: pointer; transition: 0.15s; user-select: none;
     }
-    .mult-chip.active-hit {
-      border-color: #ffd000; background: rgba(255, 208, 0, 0.14); transform: translateY(-3px);
-      box-shadow: 0 0 14px rgba(255, 208, 0, 0.35);
+    .bet-slot:hover { border-color: #6b7280; background: #1a1f27; transform: translateY(-2px); }
+    .bet-slot.has-bet { border-color: #4ade80; background: rgba(0, 184, 67, 0.1); }
+    .bet-slot.winner-glow {
+      border-color: #ffd000 !important;
+      background: rgba(255, 208, 0, 0.18) !important;
+      box-shadow: 0 0 18px rgba(255, 208, 0, 0.45);
+      transform: translateY(-4px);
     }
-    .mult-chip.active-hit .chip-val { color: #ffd000; }
-    .crown-icon { position: absolute; top: -12px; font-size: 14px; display: none; }
-    .mult-chip.active-hit .crown-icon { display: block; }
+    .slot-crown { position: absolute; top: -14px; font-size: 16px; display: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+    .bet-slot.winner-glow .slot-crown { display: block; }
+    .slot-mult { font-size: 12px; font-weight: 900; color: #e5e7eb; }
+    .slot-chip-badge {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2.5px dashed currentColor;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.35);
+      transition: 0.15s;
+    }
+    .bet-slot.has-bet .slot-chip-badge {
+      background: currentColor; color: #0b0f14 !important; border-style: solid; border-color: #fff;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+    }
 
-    .win-banner {
-      text-align: center; padding: 10px 16px; font-size: 15px; font-weight: 800; color: #e5e7eb;
-      min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    /* Status / Stake Readout */
+    .status-line {
+      text-align: center; padding: 6px 14px 10px; font-size: 14px; font-weight: 800;
+      color: #d1d5db; min-height: 36px; display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .win-banner .gold-amount { color: #ffd000; font-size: 18px; font-weight: 900; }
+    .status-line .win-gold { color: #ffd000; font-size: 17px; font-weight: 900; }
 
-    .stake-bar { padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 8px; }
-    .stake-input-row {
-      display: flex; align-items: center; background: #111317; border: 1px solid #323741;
-      border-radius: 6px; padding: 4px 10px; justify-content: space-between;
+    /* Phase 1: Betting Controls (Chip Rack + Spin) */
+    .betting-controls { display: flex; flex-direction: column; gap: 10px; padding: 0 14px 14px; }
+    .chip-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      background: #101318; border: 1px solid #282e39; border-radius: 10px; padding: 8px;
     }
-    .stake-input-row span { font-size: 12px; color: #9ca3af; font-weight: 700; }
-    .stake-input-row input {
-      background: transparent; border: none; color: #ffd000; font-weight: 900;
-      font-size: 15px; text-align: right; width: 120px; outline: none;
+    .ctrl-mini {
+      background: #232831; border: 1px solid #353c49; color: #e5e7eb;
+      height: 36px; padding: 0 9px; border-radius: 7px; font-size: 11px; font-weight: 800; cursor: pointer;
     }
-    .stake-presets { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-    .stake-presets button {
-      background: #262b33; border: 1px solid #383f4b; color: #d1d5db; font-size: 11px;
-      font-weight: 800; padding: 6px 0; border-radius: 4px; cursor: pointer;
+    .ctrl-mini:hover { background: #303744; border-color: #ffd000; }
+    .chip-rack { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding: 2px; }
+    .chip-btn {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      border: 3px dashed #ffffff; font-size: 11px; font-weight: 900; color: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.15s; box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     }
-    .stake-presets button:hover { border-color: #ffd000; color: #fff; }
+    .chip-btn.selected { transform: scale(1.16) translateY(-2px); box-shadow: 0 0 12px #ffd000; border-color: #ffd000; border-style: solid; }
 
-    .cabinet-actions { display: grid; grid-template-columns: 1fr 1fr; height: 54px; }
-    .btn-rebet { background: var(--gold-btn); color: #fff; border: none; font-size: 16px; font-weight: 800; cursor: pointer; }
-    .btn-rebet:hover:not(:disabled) { background: var(--gold-btn-hover); }
-    .btn-next-spin { background: var(--green-btn); color: #fff; border: none; font-size: 16px; font-weight: 800; cursor: pointer; }
-    .btn-next-spin:hover:not(:disabled) { background: var(--green-btn-hover); }
-    .btn-rebet:disabled, .btn-next-spin:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-spin-full {
+      width: 100%; height: 52px; background: var(--green-btn); color: #fff;
+      border: none; border-radius: 8px; font-size: 17px; font-weight: 900;
+      cursor: pointer; letter-spacing: 0.5px; transition: 0.15s;
+      box-shadow: 0 4px 16px rgba(0, 184, 67, 0.35);
+    }
+    .btn-spin-full:hover:not(:disabled) { background: var(--green-btn-hover); }
+    .btn-spin-full:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Live Feed */
-    .feed-box {
-      width: 100%; max-width: 780px; background: rgba(24, 28, 34, 0.92);
-      border: 1px solid #2e343f; border-radius: 12px; padding: 18px;
+    /* Phase 2: Post-Spin Dual Buttons (Gold Rebet + Green Next Spin) */
+    .result-controls { display: none; grid-template-columns: 1fr 1fr; height: 56px; }
+    .btn-rebet { background: var(--gold-btn); color: #fff; border: none; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .btn-rebet:hover { background: var(--gold-btn-hover); }
+    .btn-next { background: var(--green-btn); color: #fff; border: none; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .btn-next:hover { background: var(--green-btn-hover); }
+
+    /* Live PLUGBET Nigeria Feed */
+    .feed-card {
+      width: 100%; max-width: 780px; background: rgba(22, 26, 33, 0.94);
+      border: 1px solid #2d3440; border-radius: 12px; padding: 18px;
     }
     .feed-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 14px; font-weight: 800; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th { text-align: left; color: #9ca3af; padding: 8px 10px; border-bottom: 1px solid #2e343f; }
-    td { padding: 10px; border-bottom: 1px solid rgba(46, 52, 63, 0.5); font-weight: 600; }
+    th { text-align: left; color: #9ca3af; padding: 8px 10px; border-bottom: 1px solid #2d3440; }
+    td { padding: 10px; border-bottom: 1px solid rgba(45, 52, 64, 0.5); font-weight: 600; font-variant-numeric: tabular-nums; }
     .blur-mask { filter: blur(3px); user-select: none; opacity: 0.8; display: inline-block; padding: 0 2px; }
     .win-ngn { color: #00e676; font-weight: 800; }
 
-    /* Modals & Cashier Tabs */
+    /* Modals */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: #1f242c; border: 1px solid #374151; border-radius: 12px; width: 100%; max-width: 420px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal { background: #1e232c; border: 1px solid #374151; border-radius: 12px; width: 100%; max-width: 420px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
     .modal-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; }
-    .cashier-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #111317; padding: 4px; border-radius: 8px; gap: 4px; }
+    .cashier-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #111318; padding: 4px; border-radius: 8px; gap: 4px; }
     .cashier-tab { background: transparent; border: none; color: #9ca3af; padding: 8px; font-weight: 800; font-size: 13px; border-radius: 6px; cursor: pointer; }
-    .cashier-tab.active { background: #262b33; color: #fff; }
-    .modal input, .modal select { background: #111317; border: 1px solid #374151; color: #fff; padding: 11px; border-radius: 6px; font-size: 14px; width: 100%; outline: none; }
+    .cashier-tab.active { background: #262b35; color: #fff; }
+    .modal input, .modal select { background: #111318; border: 1px solid #374151; color: #fff; padding: 11px; border-radius: 6px; font-size: 14px; width: 100%; outline: none; }
     .modal-submit { background: var(--green-btn); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 800; font-size: 14px; cursor: pointer; }
-    .modal-submit:hover { background: var(--green-btn-hover); }
-    .pay-badges { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #9ca3af; }
-    .pay-badge { background: #111317; border: 1px solid #374151; padding: 4px 8px; border-radius: 4px; font-weight: 700; }
+    .hash-box { background: #111318; border: 1px solid #303642; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; color: #4ade80; }
   </style>
 </head>
 <body>
-  <div class="felt-decor"></div>
+  <div class="felt-grid"></div>
 
-  <!-- SportyBet Crimson Header -->
-  <header class="sporty-navbar">
+  <!-- PLUGBET Top Header -->
+  <header class="navbar">
     <div class="nav-left">
-      <div class="sporty-logo">SportyBet</div>
+      <div class="brand-logo">PLUGBET <span class="brand-bolt">NG</span></div>
       <div class="nav-links">
         <span>Sports</span>
         <span class="active">Games</span>
         <span>Live Betting</span>
         <span>Instant Football</span>
         <span>Jackpot</span>
-        <span>App<span class="hot-tag">HOT</span></span>
+        <span>App<span class="hot-badge">HOT</span></span>
       </div>
     </div>
     <div class="nav-right">
-      <div class="top-bal" onclick="fetchBalance()" title="Refresh NGN Balance">
+      <div class="top-balance" onclick="fetchBalance()" title="Refresh NGN Balance">
         NGN <span id="topBalance">0.00</span> ↻
       </div>
-      <button class="top-link" style="background:#00b843;" onclick="openCashier('deposit')">Deposit</button>
-      <button class="top-link" onclick="openCashier('withdraw')">Withdraw</button>
+      <button class="nav-btn green" onclick="openCashier('deposit')">Deposit</button>
+      <button class="nav-btn" onclick="openCashier('withdraw')">Withdraw</button>
       <div id="guestActions" style="display:flex; gap:8px;">
-        <button class="top-link" onclick="openModal('loginModal')">Login</button>
-        <button class="top-link" style="background:#ffd000; color:#000;" onclick="openModal('registerModal')">Register</button>
+        <button class="nav-btn" onclick="openModal('loginModal')">Login</button>
+        <button class="nav-btn gold" onclick="openModal('registerModal')">Register</button>
       </div>
       <div id="userActions" style="display:none; align-items:center; gap:8px;">
-        <span id="navUsername" style="font-size:12px;">My Account</span>
-        <button class="top-link" onclick="logout()">Logout</button>
+        <span id="navUsername" style="font-size:12px;">Account</span>
+        <button class="nav-btn" onclick="logout()">Logout</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Stage -->
-  <main class="stage-container">
+  <main class="stage">
+    <!-- PLUGBET Spin Match Cabinet -->
     <div class="cabinet">
-      <div class="cabinet-top">
-        <span style="color:#9ca3af;">❮</span>
-        <span class="cabinet-title">Spin Match</span>
-        <span style="color:#4ade80; font-size:13px; font-weight:800;">NGN</span>
-      </div>
+      <canvas id="confettiCanvas"></canvas>
 
-      <div class="cabinet-balance-bar">
-        <span>💳 NGN <span id="cabinetBalance">0.00</span></span>
-        <button class="mini-cashier-btn" onclick="openCashier('deposit')">+ Top Up</button>
-      </div>
-
-      <!-- Dual Wheels -->
-      <div class="dual-wheel-arena">
-        <div class="wheel-half-wrap wheel-left-wrap">
-          <svg class="wheel-disc" id="leftWheelSvg" viewBox="0 0 240 240"></svg>
+      <div class="cabinet-header">
+        <div class="cab-title">
+          <span style="color:#ffd000;">⚡</span> Spin Match
         </div>
-        <div class="center-bridge">
-          <div class="bridge-needle-left"></div>
+        <div class="cab-tools">
+          <button class="tool-pill" id="turboBtn" onclick="toggleTurbo()">⚡ Turbo</button>
+          <button class="tool-pill active" id="soundBtn" onclick="toggleSound()">🔊 SFX</button>
+          <button class="tool-pill" onclick="openModal('fairModal')">🛡️ Fair</button>
+        </div>
+      </div>
+
+      <div class="cab-subbar">
+        <span>💳 NGN <span id="cabinetBalance">0.00</span></span>
+        <span style="color:#9ca3af;">Tap multipliers to place chips</span>
+      </div>
+
+      <!-- Recent Rounds History Ribbon -->
+      <div class="history-ribbon" id="historyRibbon">
+        <span class="hist-pill hit">x4</span>
+        <span class="hist-pill">—</span>
+        <span class="hist-pill hit">x6</span>
+        <span class="hist-pill mega">x54</span>
+        <span class="hist-pill hit">x2</span>
+        <span class="hist-pill">—</span>
+      </div>
+
+      <!-- Dual Opposing Half-Wheels -->
+      <div class="wheel-arena">
+        <div class="wheel-wrap wheel-left">
+          <svg class="wheel-svg" id="leftWheelSvg" viewBox="0 0 240 240"></svg>
+        </div>
+        <div class="bridge">
+          <div class="needle-l"></div>
           <div class="bridge-bar"></div>
           <div class="bridge-hub"></div>
-          <div class="bridge-needle-right"></div>
+          <div class="needle-r"></div>
         </div>
-        <div class="wheel-half-wrap wheel-right-wrap">
-          <svg class="wheel-disc" id="rightWheelSvg" viewBox="0 0 240 240"></svg>
-        </div>
-      </div>
-
-      <!-- 6 Multiplier Chips -->
-      <div class="chips-row">
-        <div class="mult-chip" id="chip-2" style="color:#9ca3af;"><span class="crown-icon">👑</span><span class="chip-val">x2</span><div class="chip-circle">2</div></div>
-        <div class="mult-chip" id="chip-4" style="color:#38bdf8;"><span class="crown-icon">👑</span><span class="chip-val">x4</span><div class="chip-circle">4</div></div>
-        <div class="mult-chip" id="chip-6" style="color:#facc15;"><span class="crown-icon">👑</span><span class="chip-val">x6</span><div class="chip-circle">6</div></div>
-        <div class="mult-chip" id="chip-15" style="color:#fb923c;"><span class="crown-icon">👑</span><span class="chip-val">x15</span><div class="chip-circle">15</div></div>
-        <div class="mult-chip" id="chip-24" style="color:#4ade80;"><span class="crown-icon">👑</span><span class="chip-val">x24</span><div class="chip-circle">24</div></div>
-        <div class="mult-chip" id="chip-54" style="color:#f472b6;"><span class="crown-icon">👑</span><span class="chip-val">x54</span><div class="chip-circle">54</div></div>
-      </div>
-
-      <div class="win-banner" id="winBanner">Match Left & Right Symbols to Win up to 54×!</div>
-
-      <div class="stake-bar">
-        <div class="stake-input-row">
-          <span>STAKE (NGN)</span>
-          <input type="number" id="betInput" value="100" min="50" step="50" />
-        </div>
-        <div class="stake-presets">
-          <button onclick="setStake(100)">₦100</button>
-          <button onclick="setStake(500)">₦500</button>
-          <button onclick="setStake(1000)">₦1,000</button>
-          <button onclick="setStake(2500)">₦2,500</button>
-          <button onclick="setStake(5000)">₦5,000</button>
+        <div class="wheel-wrap wheel-right">
+          <svg class="wheel-svg" id="rightWheelSvg" viewBox="0 0 240 240"></svg>
         </div>
       </div>
 
-      <div class="cabinet-actions">
-        <button class="btn-rebet" id="rebetBtn" onclick="executeSpin(true)">Rebet</button>
-        <button class="btn-next-spin" id="spinBtn" onclick="executeSpin(false)">Next Spin</button>
+      <!-- 6 Clickable Multiplier Betting Cards -->
+      <div class="slots-grid">
+        <div class="bet-slot" id="slot-2" style="color:#94a3b8;" onclick="placeChip('2')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x2</span>
+          <div class="slot-chip-badge" id="badge-2">2</div>
+        </div>
+        <div class="bet-slot" id="slot-4" style="color:#38bdf8;" onclick="placeChip('4')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x4</span>
+          <div class="slot-chip-badge" id="badge-4">4</div>
+        </div>
+        <div class="bet-slot" id="slot-6" style="color:#facc15;" onclick="placeChip('6')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x6</span>
+          <div class="slot-chip-badge" id="badge-6">6</div>
+        </div>
+        <div class="bet-slot" id="slot-15" style="color:#fb923c;" onclick="placeChip('15')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x15</span>
+          <div class="slot-chip-badge" id="badge-15">15</div>
+        </div>
+        <div class="bet-slot" id="slot-24" style="color:#4ade80;" onclick="placeChip('24')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x24</span>
+          <div class="slot-chip-badge" id="badge-24">24</div>
+        </div>
+        <div class="bet-slot" id="slot-54" style="color:#f472b6;" onclick="placeChip('54')">
+          <span class="slot-crown">👑</span>
+          <span class="slot-mult">x54</span>
+          <div class="slot-chip-badge" id="badge-54">54</div>
+        </div>
+      </div>
+
+      <!-- Stake / Win Status Line -->
+      <div class="status-line" id="statusLine">
+        Stake NGN <span id="totalStakeText" style="color:#fff;">0.00</span>
+      </div>
+
+      <!-- Phase 1: Chip Rack & Spin Button -->
+      <div class="betting-controls" id="bettingControls">
+        <div class="chip-toolbar">
+          <button class="ctrl-mini" onclick="clearBets()" title="Clear all chips">✕</button>
+          <button class="ctrl-mini" onclick="undoBet()" title="Undo last chip">↩</button>
+          <div class="chip-rack">
+            <button class="chip-btn selected" style="background:#3b82f6;" onclick="selectChip(50, this)">50</button>
+            <button class="chip-btn" style="background:#ef4444;" onclick="selectChip(100, this)">100</button>
+            <button class="chip-btn" style="background:#10b981;" onclick="selectChip(200, this)">200</button>
+            <button class="chip-btn" style="background:#f59e0b;" onclick="selectChip(500, this)">500</button>
+            <button class="chip-btn" style="background:#8b5cf6;" onclick="selectChip(1000, this)">1K</button>
+            <button class="chip-btn" style="background:#ec4899;" onclick="selectChip(5000, this)">5K</button>
+          </div>
+          <button class="ctrl-mini" onclick="doubleBets()" title="Double all bets">2×</button>
+          <button class="ctrl-mini" onclick="betAllSlots()" title="Place chip on all 6">All</button>
+        </div>
+
+        <button class="btn-spin-full" id="spinBtn" onclick="spinWheels(false)">Spin</button>
+      </div>
+
+      <!-- Phase 2: Rebet & Next Spin Buttons -->
+      <div class="result-controls" id="resultControls">
+        <button class="btn-rebet" id="rebetBtn" onclick="spinWheels(true)">Rebet</button>
+        <button class="btn-next" onclick="enterBettingPhase()">Next Spin</button>
       </div>
     </div>
 
-    <!-- Live Nigerian Winners Feed -->
-    <div class="feed-box">
+    <!-- Live PLUGBET Nigeria Feed -->
+    <div class="feed-card">
       <div class="feed-head">
-        <span>🟢 Live Spin Match Winners (Nigeria)</span>
+        <span>🟢 Live PLUGBET Winners (Nigeria)</span>
         <span style="color:#9ca3af; font-size:11px;">Privacy Protected</span>
       </div>
       <table>
@@ -305,7 +414,7 @@
   <!-- Register Modal -->
   <div class="modal-backdrop" id="registerModal">
     <div class="modal">
-      <div class="modal-head"><span>Register (NGN 50,000 Bonus)</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <div class="modal-head"><span>Join PLUGBET (NGN 50,000 Bonus)</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
       <input type="text" id="regUser" placeholder="Username (e.g. Chinedu_NG)" />
       <input type="password" id="regPass" placeholder="Password" />
       <button class="modal-submit" onclick="registerUser()">Create Account</button>
@@ -315,64 +424,90 @@
   <!-- Login Modal -->
   <div class="modal-backdrop" id="loginModal">
     <div class="modal">
-      <div class="modal-head"><span>Sign In to SportyBet Spin Match</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <div class="modal-head"><span>Sign In to PLUGBET</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
       <input type="text" id="loginUser" placeholder="Username" />
       <input type="password" id="loginPass" placeholder="Password" />
       <button class="modal-submit" onclick="loginUser()">Login</button>
     </div>
   </div>
 
-  <!-- Cashier Modal (Deposit + Withdraw) -->
+  <!-- Provably Fair Modal -->
+  <div class="modal-backdrop" id="fairModal">
+    <div class="modal">
+      <div class="modal-head"><span>🛡️ Provably Fair Audit</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
+      <p style="font-size:12px; color:#9ca3af; line-height:1.5;">
+        Every PLUGBET Spin Match round is generated server-side using Node.js cryptographic CSPRNG (`crypto.randomBytes`) hashed with SHA-256.
+      </p>
+      <div style="font-size:12px; font-weight:700;">Last Round ID: <span id="fairRoundId" style="color:#ffd000;">—</span></div>
+      <div class="hash-box" id="fairRoundHash">Spin once to inspect the SHA-256 round digest.</div>
+      <button class="modal-submit" onclick="closeModals()">Close</button>
+    </div>
+  </div>
+
+  <!-- Cashier Modal (Paystack Deposit + Bank Withdraw) -->
   <div class="modal-backdrop" id="cashierModal">
     <div class="modal">
-      <div class="modal-head">
-        <span>NGN Cashier</span>
-        <span style="cursor:pointer;" onclick="closeModals()">✕</span>
-      </div>
-
+      <div class="modal-head"><span>PLUGBET NGN Cashier</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
       <div class="cashier-tabs">
         <button class="cashier-tab active" id="tabDeposit" onclick="switchCashierTab('deposit')">Deposit (Paystack)</button>
         <button class="cashier-tab" id="tabWithdraw" onclick="switchCashierTab('withdraw')">Withdraw (Bank)</button>
       </div>
-
-      <!-- Deposit Form -->
       <div id="depositPanel" style="display:flex; flex-direction:column; gap:12px;">
-        <div class="pay-badges">
-          <span class="pay-badge">💳 Visa / Mastercard / Verve</span>
-          <span class="pay-badge">🏦 Bank Transfer</span>
-          <span class="pay-badge">📱 *737# / *901# USSD</span>
-        </div>
         <input type="number" id="depositAmount" value="5000" min="100" placeholder="Deposit Amount (NGN)" />
         <input type="email" id="depositEmail" placeholder="Receipt Email (e.g. chinedu@gmail.com)" />
         <button class="modal-submit" id="depositSubmitBtn" onclick="submitDeposit()">Pay with Paystack</button>
       </div>
-
-      <!-- Withdraw Form -->
       <div id="withdrawPanel" style="display:none; flex-direction:column; gap:12px;">
         <select id="bankName">
           <option value="OPay Digital Services">OPay</option>
           <option value="PalmPay">PalmPay</option>
-          <option value="Guaranty Trust Bank (GTBank)">GTBank</option>
+          <option value="GTBank">GTBank</option>
           <option value="Access Bank">Access Bank</option>
           <option value="Zenith Bank">Zenith Bank</option>
-          <option value="United Bank for Africa (UBA)">UBA</option>
-          <option value="First Bank of Nigeria">First Bank</option>
-          <option value="Kuda Microfinance Bank">Kuda Bank</option>
+          <option value="UBA">UBA</option>
+          <option value="Kuda Bank">Kuda Bank</option>
         </select>
-        <input type="text" id="accountNumber" maxlength="10" placeholder="10-Digit Account Number (NUBAN)" />
+        <input type="text" id="accountNumber" maxlength="10" placeholder="10-Digit NUBAN Account Number" />
         <input type="text" id="accountName" placeholder="Account Holder Name" />
         <input type="number" id="withdrawAmount" value="5000" min="1000" placeholder="Withdraw Amount (Min ₦1,000)" />
-        <button class="modal-submit" style="background:#b5a624;" onclick="submitWithdrawal()">Request Instant Bank Payout</button>
+        <button class="modal-submit" style="background:#b5a624;" onclick="submitWithdrawal()">Request Instant Payout</button>
       </div>
     </div>
   </div>
 
   <script>
+    const SLOTS = ['2', '4', '6', '15', '24', '54'];
     let token = localStorage.getItem('casino_token') || '';
     let username = localStorage.getItem('casino_user') || '';
-    let lastStake = 100;
+    let selectedChip = 50;
+    let bets = { '2': 0, '4': 0, '6': 0, '15': 0, '24': 0, '54': 0 };
+    let lastRoundBets = null;
+    let betUndoStack = [];
+    let isSpinning = false;
+    let turboMode = false;
+    let soundEnabled = true;
     let leftRot = 0;
     let rightRot = 0;
+
+    // Synthesized Web Audio SFX (Zero external dependencies)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playTone(freq, dur, type = 'sine', vol = 0.08) {
+      if (!soundEnabled) return;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + dur);
+    }
+    function playChipSfx() { playTone(680, 0.06, 'triangle', 0.07); }
+    function playWinSfx(isBig) {
+      const notes = isBig ? [523, 659, 784, 1046, 1318] : [523, 659, 784];
+      notes.forEach((f, idx) => setTimeout(() => playTone(f, 0.22, 'triangle', 0.1), idx * 90));
+    }
 
     const wheelWedges = [
       { label: 'x6',   bg: '#f5b82e', fg: '#111827' },
@@ -390,12 +525,15 @@
     function fmtNGN(val) {
       return Number(val || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
+    function fmtCompact(val) {
+      if (val >= 1000) return (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'K';
+      return String(val);
+    }
 
     function drawWheel(svgId, isLeft) {
       const svg = document.getElementById(svgId);
       svg.innerHTML = '';
-      const cx = 120, cy = 120, r = 112;
-      const slice = 360 / wheelWedges.length;
+      const cx = 120, cy = 120, r = 112, slice = 360 / wheelWedges.length;
 
       const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       outer.setAttribute('cx', cx); outer.setAttribute('cy', cy); outer.setAttribute('r', 118);
@@ -440,19 +578,213 @@
       const targetMod = (pointerDeg - wedgeCenter + 360) % 360;
       const curMod = ((currentAngle % 360) + 360) % 360;
       const delta = (targetMod - curMod + 360) % 360;
-      return currentAngle + (360 * 6) + delta;
+      return currentAngle + (360 * (turboMode ? 3 : 6)) + delta;
     }
 
+    // Chip & Betting Slot Management
+    function selectChip(val, el) {
+      selectedChip = val;
+      playChipSfx();
+      document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function renderBetSlots() {
+      let total = 0;
+      SLOTS.forEach(s => {
+        const amt = bets[s] || 0;
+        total += amt;
+        const slotEl = document.getElementById(`slot-${s}`);
+        const badgeEl = document.getElementById(`badge-${s}`);
+        slotEl.classList.toggle('has-bet', amt > 0);
+        badgeEl.textContent = amt > 0 ? fmtCompact(amt) : s;
+      });
+      document.getElementById('statusLine').innerHTML = `Stake NGN <span style="color:#fff;">${fmtNGN(total)}</span>`;
+      document.getElementById('spinBtn').disabled = total <= 0 || isSpinning;
+    }
+
+    function placeChip(slot) {
+      if (isSpinning) return;
+      if (document.getElementById('resultControls').style.display === 'grid') enterBettingPhase();
+      bets[slot] = (bets[slot] || 0) + selectedChip;
+      betUndoStack.push({ slot, amount: selectedChip });
+      playChipSfx();
+      renderBetSlots();
+    }
+
+    function undoBet() {
+      if (isSpinning || betUndoStack.length === 0) return;
+      const last = betUndoStack.pop();
+      bets[last.slot] = Math.max(0, (bets[last.slot] || 0) - last.amount);
+      playChipSfx();
+      renderBetSlots();
+    }
+
+    function clearBets() {
+      if (isSpinning) return;
+      SLOTS.forEach(s => bets[s] = 0);
+      betUndoStack = [];
+      playChipSfx();
+      renderBetSlots();
+    }
+
+    function doubleBets() {
+      if (isSpinning) return;
+      SLOTS.forEach(s => { if (bets[s] > 0) bets[s] *= 2; });
+      playChipSfx();
+      renderBetSlots();
+    }
+
+    function betAllSlots() {
+      if (isSpinning) return;
+      SLOTS.forEach(s => {
+        bets[s] = (bets[s] || 0) + selectedChip;
+        betUndoStack.push({ slot: s, amount: selectedChip });
+      });
+      playChipSfx();
+      renderBetSlots();
+    }
+
+    function enterBettingPhase() {
+      document.querySelectorAll('.bet-slot').forEach(s => s.classList.remove('winner-glow'));
+      document.getElementById('resultControls').style.display = 'none';
+      document.getElementById('bettingControls').style.display = 'flex';
+      renderBetSlots();
+    }
+
+    function toggleTurbo() {
+      turboMode = !turboMode;
+      document.getElementById('turboBtn').classList.toggle('active', turboMode);
+    }
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundBtn');
+      btn.classList.toggle('active', soundEnabled);
+      btn.textContent = soundEnabled ? '🔊 SFX' : '🔇 Muted';
+    }
+
+    // Confetti Celebration for Big Wins
+    function burstConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+      const pieces = Array.from({ length: 65 }, () => ({
+        x: canvas.width / 2, y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.8) * 10,
+        color: ['#ffd000', '#00e701', '#f472b6', '#38bdf8', '#ffffff'][Math.floor(Math.random() * 5)],
+        size: Math.random() * 6 + 4, life: 60
+      }));
+      function tick() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        pieces.forEach(p => {
+          if (p.life-- > 0) {
+            alive = true;
+            p.x += p.vx; p.y += p.vy; p.vy += 0.25;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size * 0.6);
+          }
+        });
+        if (alive) requestAnimationFrame(tick);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      tick();
+    }
+
+    async function spinWheels(isRebet) {
+      if (!token) return openModal('loginModal');
+      if (isSpinning) return;
+
+      if (isRebet && lastRoundBets) {
+        bets = { ...lastRoundBets };
+        renderBetSlots();
+      }
+
+      const activeTotal = SLOTS.reduce((acc, s) => acc + (bets[s] || 0), 0);
+      if (activeTotal <= 0) return alert('Tap one or more multiplier chips (x2–x54) to place your bet.');
+
+      isSpinning = true;
+      lastRoundBets = { ...bets };
+      document.querySelectorAll('.bet-slot').forEach(s => s.classList.remove('winner-glow'));
+      document.getElementById('bettingControls').style.display = 'none';
+      document.getElementById('resultControls').style.display = 'none';
+      document.getElementById('statusLine').textContent = 'Spinning Both Wheels...';
+
+      const res = await fetch('/api/spin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ bets })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        isSpinning = false;
+        enterBettingPhase();
+        document.getElementById('statusLine').textContent = data.error || 'Spin failed';
+        return;
+      }
+
+      const durationMs = turboMode ? 1200 : 3200;
+      const transitionCss = `transform ${durationMs / 1000}s cubic-bezier(0.14, 0.86, 0.22, 1)`;
+      const lw = document.getElementById('leftWheelSvg');
+      const rw = document.getElementById('rightWheelSvg');
+      lw.style.transition = transitionCss;
+      rw.style.transition = transitionCss;
+
+      leftRot = computeWheelAngle(data.leftSymbol, 90, leftRot);
+      rightRot = computeWheelAngle(data.rightSymbol, 270, rightRot);
+      lw.style.transform = `rotate(${leftRot}deg)`;
+      rw.style.transform = `rotate(${rightRot}deg)`;
+
+      // Mechanical wheel ticks during spin
+      const tickCount = turboMode ? 6 : 14;
+      for (let i = 0; i < tickCount; i++) {
+        setTimeout(() => playTone(260 + i * 12, 0.03, 'square', 0.03), (durationMs / tickCount) * i);
+      }
+
+      setTimeout(() => {
+        isSpinning = false;
+        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
+        document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
+        document.getElementById('fairRoundId').textContent = data.roundId;
+        document.getElementById('fairRoundHash').textContent = data.roundHash;
+
+        // Add to History Ribbon
+        const ribbon = document.getElementById('historyRibbon');
+        const pill = document.createElement('span');
+        pill.className = `hist-pill ${data.multiplier >= 15 ? 'mega' : (data.multiplier > 0 ? 'hit' : '')}`;
+        pill.textContent = data.multiplier > 0 ? `x${data.multiplier}` : '—';
+        ribbon.insertBefore(pill, ribbon.firstChild);
+        if (ribbon.children.length > 14) ribbon.removeChild(ribbon.lastChild);
+
+        if (data.multiplier > 0) {
+          const winSlot = document.getElementById(`slot-${data.multiplier}`);
+          if (winSlot) winSlot.classList.add('winner-glow');
+        }
+
+        if (data.winAmount > 0) {
+          playWinSfx(data.multiplier >= 15);
+          if (data.multiplier >= 15) burstConfetti();
+          document.getElementById('statusLine').innerHTML = `You Won 🏆 <span class="win-gold">NGN ${fmtNGN(data.winAmount)}</span>`;
+        } else if (data.multiplier > 0) {
+          document.getElementById('statusLine').textContent = `Matched x${data.multiplier} (No chip on x${data.multiplier})`;
+        } else {
+          document.getElementById('statusLine').textContent = `${data.leftSymbol} vs ${data.rightSymbol} — No Match`;
+        }
+
+        document.getElementById('resultControls').style.display = 'grid';
+
+        const maskedName = username.length > 3
+          ? `${username.slice(0, 3)}<span class="blur-mask">${username.slice(3)}</span>`
+          : username;
+        addFeedRow(maskedName, `0803<span class="blur-mask">7492</span>NGN`, data.totalStake, data.multiplier > 0 ? `x${data.multiplier}` : '—', data.winAmount);
+      }, durationMs + 60);
+    }
+
+    // Auth & Cashier
     function openModal(id) { document.getElementById(id).classList.add('open'); }
     function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open')); }
-    function setStake(val) { document.getElementById('betInput').value = val; }
-
-    function openCashier(tab) {
-      if (!token) return openModal('loginModal');
-      switchCashierTab(tab);
-      openModal('cashierModal');
-    }
-
+    function openCashier(tab) { if (!token) return openModal('loginModal'); switchCashierTab(tab); openModal('cashierModal'); }
     function switchCashierTab(tab) {
       const isDep = tab === 'deposit';
       document.getElementById('tabDeposit').classList.toggle('active', isDep);
@@ -477,28 +809,19 @@
     }
 
     async function registerUser() {
-      const u = document.getElementById('regUser').value;
-      const p = document.getElementById('regPass').value;
-      const res = await fetch('/api/register', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: u, password: p })
-      });
+      const u = document.getElementById('regUser').value, p = document.getElementById('regPass').value;
+      const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
       const data = await res.json();
       if (res.ok) {
         token = data.token; username = data.username || u;
         localStorage.setItem('casino_token', token); localStorage.setItem('casino_user', username);
         closeModals(); syncAuthUI();
-        document.getElementById('winBanner').innerHTML = `Welcome! <span class="gold-amount">NGN ${fmtNGN(data.balance)}</span> Credited`;
       } else alert(data.error || 'Registration failed');
     }
 
     async function loginUser() {
-      const u = document.getElementById('loginUser').value;
-      const p = document.getElementById('loginPass').value;
-      const res = await fetch('/api/login', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: u, password: p })
-      });
+      const u = document.getElementById('loginUser').value, p = document.getElementById('loginPass').value;
+      const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
       const data = await res.json();
       if (res.ok) {
         token = data.token; username = data.username || u;
@@ -527,24 +850,22 @@
       const amount = parseFloat(document.getElementById('depositAmount').value);
       const email = document.getElementById('depositEmail').value;
       const btn = document.getElementById('depositSubmitBtn');
-      btn.disabled = true; btn.textContent = 'Initializing Checkout...';
+      btn.disabled = true; btn.textContent = 'Connecting to Paystack...';
 
       const res = await fetch('/api/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ amount, email, mode: 'paystack' })
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ amount, email })
       });
       const data = await res.json();
       btn.disabled = false; btn.textContent = 'Pay with Paystack';
 
       if (res.ok) {
-        if (data.payment_url) {
-          window.location.href = data.payment_url; // Redirect to Paystack NGN checkout
-        } else {
+        if (data.payment_url) window.location.href = data.payment_url;
+        else {
           document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
           document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
           closeModals();
-          document.getElementById('winBanner').innerHTML = `Deposit Credited: <span class="gold-amount">+NGN ${fmtNGN(amount)}</span>`;
+          document.getElementById('statusLine').innerHTML = `Credited <span class="win-gold">+NGN ${fmtNGN(amount)}</span>`;
         }
       } else alert(data.error || 'Deposit failed');
     }
@@ -553,18 +874,13 @@
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('reference') || params.get('trxref');
       if (!ref || !token) return;
-
-      document.getElementById('winBanner').textContent = 'Verifying Paystack Payment...';
-      const res = await fetch(`/api/deposit/verify/${encodeURIComponent(ref)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await fetch(`/api/deposit/verify/${encodeURIComponent(ref)}`, { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
       window.history.replaceState({}, document.title, '/');
-
       if (res.ok && data.status === 'completed') {
         document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
         document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
-        document.getElementById('winBanner').innerHTML = `Paystack Verified! <span class="gold-amount">+NGN ${fmtNGN(data.amountNGN)}</span>`;
+        document.getElementById('statusLine').innerHTML = `Paystack Verified <span class="win-gold">+NGN ${fmtNGN(data.amountNGN)}</span>`;
       }
     }
 
@@ -573,10 +889,8 @@
       const accountNumber = document.getElementById('accountNumber').value.trim();
       const accountName = document.getElementById('accountName').value.trim();
       const amount = parseFloat(document.getElementById('withdrawAmount').value);
-
       const res = await fetch('/api/withdraw', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ bankName, accountNumber, accountName, amount })
       });
       const data = await res.json();
@@ -584,64 +898,12 @@
         document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
         document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
         closeModals();
-        document.getElementById('winBanner').innerHTML = `Payout Sent: <span class="gold-amount">NGN ${fmtNGN(amount)}</span>`;
+        document.getElementById('statusLine').innerHTML = `Payout Sent <span class="win-gold">NGN ${fmtNGN(amount)}</span>`;
       } else alert(data.error || 'Withdrawal failed');
     }
 
-    async function executeSpin(isRebet) {
-      if (!token) return openModal('loginModal');
-      const bet = isRebet ? lastStake : parseFloat(document.getElementById('betInput').value);
-      if (isNaN(bet) || bet <= 0) return alert('Enter a valid stake');
-      lastStake = bet;
-      document.getElementById('betInput').value = bet;
-
-      const spinBtn = document.getElementById('spinBtn');
-      const rebetBtn = document.getElementById('rebetBtn');
-      spinBtn.disabled = true; rebetBtn.disabled = true;
-
-      document.querySelectorAll('.mult-chip').forEach(c => c.classList.remove('active-hit'));
-      document.getElementById('winBanner').textContent = 'Spinning Both Wheels...';
-
-      const res = await fetch('/api/spin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ bet })
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        spinBtn.disabled = false; rebetBtn.disabled = false;
-        document.getElementById('winBanner').textContent = data.error || 'Spin failed';
-        return;
-      }
-
-      leftRot = computeWheelAngle(data.leftSymbol, 90, leftRot);
-      rightRot = computeWheelAngle(data.rightSymbol, 270, rightRot);
-      document.getElementById('leftWheelSvg').style.transform = `rotate(${leftRot}deg)`;
-      document.getElementById('rightWheelSvg').style.transform = `rotate(${rightRot}deg)`;
-
-      setTimeout(() => {
-        spinBtn.disabled = false; rebetBtn.disabled = false;
-        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-        document.getElementById('cabinetBalance').textContent = fmtNGN(data.newBalance);
-
-        if (data.multiplier > 0) {
-          const activeChip = document.getElementById(`chip-${data.multiplier}`);
-          if (activeChip) activeChip.classList.add('active-hit');
-          document.getElementById('winBanner').innerHTML = `You Won 🏆 <span class="gold-amount">NGN ${fmtNGN(data.winAmount)}</span>`;
-        } else {
-          document.getElementById('winBanner').textContent = `${data.leftSymbol} vs ${data.rightSymbol} — No Match. Try Again!`;
-        }
-
-        const maskedName = username.length > 3
-          ? `${username.slice(0, 3)}<span class="blur-mask">${username.slice(3)}</span>`
-          : username;
-        addFeedRow(maskedName, `0803<span class="blur-mask">7492</span>NGN`, bet, data.multiplier > 0 ? `x${data.multiplier}` : '—', data.winAmount);
-      }, 3250);
-    }
-
     const naijaPlayers = [
-      { first: 'Chinedu', last: 'Okafor',   p1: '0803', p2: '7492', p3: '819', bet: 100,  mult: 54 },
+      { first: 'Chinedu', last: 'Okafor',   p1: '0803', p2: '7492', p3: '819', bet: 300,  mult: 54 },
       { first: 'Amina',   last: 'Bello',    p1: '0814', p2: '3301', p3: '402', bet: 500,  mult: 6 },
       { first: 'Tunde',   last: 'Adeyemi',  p1: '0706', p2: '8821', p3: '915', bet: 1000, mult: 4 },
       { first: 'Ngozi',   last: 'Eze',      p1: '0902', p2: '5190', p3: '673', bet: 250,  mult: 24 },
@@ -671,6 +933,7 @@
 
     drawWheel('leftWheelSvg', true);
     drawWheel('rightWheelSvg', false);
+    renderBetSlots();
     syncAuthUI();
   </script>
 </body>

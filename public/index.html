@@ -3,886 +3,1737 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PLUGBET — Aviator | Nigeria's #1 Crash Game</title>
+  <title>PLUGBET NG — Aviator | Instant Crash Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --plug-red: #e41827;
-      --aviator-red: #e50914;
+      --plug-red-dark: #b60f1c;
       --bg-dark: #0e1015;
-      --panel-bg: #181b22;
-      --panel-elevated: #222630;
-      --border: #2c313d;
-      --green-btn: #28a745;
-      --green-btn-hover: #2ec450;
-      --orange-btn: #d97706;
-      --red-btn: #dc2626;
-      --text-main: #ffffff;
-      --text-muted: #9ca3af;
+      --panel-bg: #171a21;
+      --panel-border: #262b36;
+      --green-bet: #28a909;
+      --green-bet-hover: #31c40e;
+      --orange-cashout: #d97706;
+      --orange-cashout-glow: #f59e0b;
+      --red-cancel: #cb011a;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
     body {
-      background: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
       overflow-x: hidden;
+      user-select: none;
     }
 
-    /* PLUGBET Crimson Top Navbar */
-    .navbar {
-      background: linear-gradient(90deg, #d81423 0%, #e41827 50%, #c7121f 100%);
-      height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      position: sticky;
-      top: 0;
-      z-index: 60;
-      box-shadow: 0 3px 14px rgba(0,0,0,0.5);
-    }
-    .nav-left { display: flex; align-items: center; gap: 18px; overflow-x: auto; }
-    .brand-logo {
-      font-weight: 900; font-size: 21px; font-style: italic; letter-spacing: 0.4px;
-      display: flex; align-items: center; gap: 6px; color: #fff;
-    }
-    .brand-bolt { background: #ffd000; color: #000; font-style: normal; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
-    .nav-links { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; white-space: nowrap; }
-    .nav-links span { cursor: pointer; opacity: 0.9; padding: 6px 10px; border-radius: 4px; }
-    .nav-links span.active { background: #fff; color: var(--plug-red); font-weight: 800; }
-    .hot-badge { background: #ffd000; color: #000; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; vertical-align: super; margin-left: 2px; }
-
-    .nav-right { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; white-space: nowrap; }
-    .top-balance {
-      background: rgba(0,0,0,0.28); padding: 6px 12px; border-radius: 6px;
-      color: #ffd000; font-weight: 800; cursor: pointer; font-variant-numeric: tabular-nums;
-    }
-    .nav-btn {
-      background: rgba(0,0,0,0.24); color: #fff; border: none; padding: 7px 11px;
-      border-radius: 5px; font-size: 12px; font-weight: 800; cursor: pointer;
-    }
-    .nav-btn:hover { background: rgba(0,0,0,0.4); }
-    .nav-btn.green { background: #00b843; }
-    .nav-btn.gold { background: #ffd000; color: #000; }
-
-    /* Main Workspace */
-    .workspace {
-      max-width: 1320px; width: 100%; margin: 14px auto 32px; padding: 0 14px;
-      display: grid; grid-template-columns: 350px 1fr; gap: 14px;
-    }
-
-    /* Left Column: Live Bets Sidebar */
-    .bets-sidebar {
-      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 12px;
-      display: flex; flex-direction: column; overflow: hidden; max-height: 760px;
-    }
-    .sidebar-tabs {
-      display: grid; grid-template-columns: repeat(3, 1fr); background: #12141a;
-      padding: 6px; gap: 4px; border-bottom: 1px solid var(--border);
-    }
-    .s-tab {
-      background: transparent; border: none; color: var(--text-muted); font-size: 12px;
-      font-weight: 800; padding: 8px 4px; border-radius: 6px; cursor: pointer;
-    }
-    .s-tab.active { background: var(--panel-elevated); color: #fff; }
-    .sidebar-stats {
-      display: flex; justify-content: space-between; padding: 10px 14px;
-      font-size: 11px; font-weight: 700; color: var(--text-muted); border-bottom: 1px solid var(--border);
-    }
-    .bets-list { flex: 1; overflow-y: auto; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px; }
-    .bet-row {
-      display: grid; grid-template-columns: 1.4fr 1fr 0.7fr 1.1fr; align-items: center;
-      padding: 7px 10px; border-radius: 8px; background: #13161c; font-size: 12px; font-weight: 700;
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
       font-variant-numeric: tabular-nums;
     }
-    .bet-row.cashed { background: rgba(40, 167, 69, 0.14); border: 1px solid rgba(40, 167, 69, 0.35); }
-    .blur-mask { filter: blur(3px); user-select: none; opacity: 0.8; display: inline-block; padding: 0 2px; }
-    .mult-pill {
-      background: rgba(56, 189, 248, 0.16); color: #38bdf8; padding: 2px 6px;
-      border-radius: 10px; font-size: 11px; font-weight: 800; text-align: center;
-    }
-    .mult-pill.high { background: rgba(192, 132, 252, 0.2); color: #c084fc; }
 
-    /* Right Column: Aviator Stage + Dual Bet Panels */
-    .game-column { display: flex; flex-direction: column; gap: 12px; }
-
-    /* Recent Multipliers Ribbon */
-    .history-bar {
-      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
     }
-    .history-pills { display: flex; align-items: center; gap: 6px; overflow-x: auto; }
-    .h-pill {
-      padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 900; flex-shrink: 0;
-      font-variant-numeric: tabular-nums;
+    ::-webkit-scrollbar-track {
+      background: #12151c;
     }
-    .h-blue { background: rgba(56, 189, 248, 0.16); color: #38bdf8; }
-    .h-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-    .h-pink { background: rgba(236, 72, 153, 0.22); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.4); }
-
-    /* Flight Canvas Arena */
-    .arena-card {
-      position: relative; width: 100%; height: 370px; background: #0b0d11;
-      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-    }
-    #aviatorCanvas { width: 100%; height: 100%; display: block; }
-
-    .arena-overlay {
-      position: absolute; inset: 0; pointer-events: none;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .center-mult {
-      font-size: 62px; font-weight: 900; letter-spacing: -1.5px;
-      text-shadow: 0 4px 24px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums;
-    }
-    .center-mult.crashed { color: var(--aviator-red); }
-    .flew-banner {
-      font-size: 20px; font-weight: 900; color: var(--aviator-red);
-      letter-spacing: 1px; margin-bottom: 4px; display: none; text-transform: uppercase;
+    ::-webkit-scrollbar-thumb {
+      background: #2e3442;
+      border-radius: 9999px;
     }
 
-    /* Boarding Countdown Box */
-    .boarding-box {
-      display: none; flex-direction: column; align-items: center; gap: 10px;
-      background: rgba(14, 16, 21, 0.85); padding: 20px 32px; border-radius: 14px;
-      border: 1px solid #2c313d;
+    /* Multiplier Pill Badges */
+    .pill-blue {
+      background: rgba(52, 180, 255, 0.14);
+      color: #34b4ff;
+      border: 1px solid rgba(52, 180, 255, 0.35);
     }
-    .boarding-title { font-size: 16px; font-weight: 900; letter-spacing: 0.8px; color: #fff; }
-    .progress-track { width: 220px; height: 6px; background: #262b36; border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; width: 100%; background: var(--aviator-red); transition: width 0.1s linear; }
-
-    /* Toast Notification inside Arena */
-    .win-toast {
-      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-      background: rgba(20, 83, 45, 0.94); border: 1px solid #4ade80;
-      padding: 8px 18px; border-radius: 24px; font-size: 13px; font-weight: 800;
-      color: #fff; display: none; align-items: center; gap: 8px; z-index: 20;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    .pill-purple {
+      background: rgba(145, 62, 248, 0.16);
+      color: #b57bff;
+      border: 1px solid rgba(145, 62, 248, 0.4);
     }
-
-    /* Dual Bet Panels */
-    .bet-panels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .bet-panel {
-      background: var(--panel-bg); border: 1px solid var(--border); border-radius: 14px;
-      padding: 14px; display: flex; flex-direction: column; gap: 12px;
-    }
-    .panel-top-row { display: flex; justify-content: space-between; align-items: center; }
-    .mode-switch {
-      display: flex; background: #101217; padding: 3px; border-radius: 20px; border: 1px solid #262a34;
-    }
-    .mode-btn {
-      background: transparent; border: none; color: var(--text-muted); font-size: 12px;
-      font-weight: 800; padding: 5px 16px; border-radius: 16px; cursor: pointer;
-    }
-    .mode-btn.active { background: var(--panel-elevated); color: #fff; }
-
-    .panel-main { display: grid; grid-template-columns: 1.05fr 1fr; gap: 10px; align-items: stretch; }
-    .stake-controls { display: flex; flex-direction: column; gap: 6px; }
-    .stepper {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #101217; border: 1px solid #2c313d; border-radius: 22px; padding: 4px 8px;
-    }
-    .step-btn {
-      width: 26px; height: 26px; border-radius: 50%; background: var(--panel-elevated);
-      border: none; color: #fff; font-weight: 900; font-size: 15px; cursor: pointer;
-    }
-    .stepper input {
-      background: transparent; border: none; color: #fff; font-weight: 900; font-size: 15px;
-      width: 82px; text-align: center; outline: none;
-    }
-    .presets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-    .presets-grid button {
-      background: #12141a; border: 1px solid #282d38; color: #d1d5db;
-      font-size: 11px; font-weight: 800; padding: 5px 0; border-radius: 12px; cursor: pointer;
-    }
-    .presets-grid button:hover { border-color: #ffd000; color: #fff; }
-
-    /* Big Action Button (BET / CANCEL / CASH OUT) */
-    .action-btn {
-      border: none; border-radius: 14px; color: #fff; font-weight: 900; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2px; transition: 0.15s; padding: 10px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    }
-    .action-btn.state-bet { background: var(--green-btn); border: 1px solid #4ade80; }
-    .action-btn.state-bet:hover { background: var(--green-btn-hover); }
-    .action-btn.state-cancel { background: var(--red-btn); border: 1px solid #f87171; }
-    .action-btn.state-cashout { background: var(--orange-btn); border: 1px solid #fbbf24; }
-    .action-btn .btn-label { font-size: 17px; letter-spacing: 0.4px; }
-    .action-btn .btn-sub { font-size: 13px; font-weight: 800; opacity: 0.95; }
-
-    /* Auto Bar */
-    .auto-bar {
-      display: none; align-items: center; justify-content: space-between; gap: 8px;
-      padding-top: 8px; border-top: 1px solid var(--border); font-size: 12px; font-weight: 700;
-    }
-    .auto-bar.visible { display: flex; }
-    .auto-group { display: flex; align-items: center; gap: 6px; }
-    .auto-input {
-      width: 64px; background: #101217; border: 1px solid #2c313d; color: #ffd000;
-      padding: 4px 6px; border-radius: 8px; font-weight: 800; text-align: center; outline: none;
+    .pill-pink {
+      background: rgba(192, 23, 180, 0.18);
+      color: #ff5ce8;
+      border: 1px solid rgba(255, 92, 232, 0.45);
+      box-shadow: 0 0 10px rgba(255, 92, 232, 0.25);
     }
 
-    /* Modals */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.82); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-    .modal-backdrop.open { display: flex; }
-    .modal { background: #1e232c; border: 1px solid #374151; border-radius: 12px; width: 100%; max-width: 420px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
-    .modal-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 16px; }
-    .cashier-tabs { display: grid; grid-template-columns: 1fr 1fr; background: #111318; padding: 4px; border-radius: 8px; gap: 4px; }
-    .cashier-tab { background: transparent; border: none; color: #9ca3af; padding: 8px; font-weight: 800; font-size: 13px; border-radius: 6px; cursor: pointer; }
-    .cashier-tab.active { background: #262b35; color: #fff; }
-    .modal input, .modal select { background: #111318; border: 1px solid #374151; color: #fff; padding: 11px; border-radius: 6px; font-size: 14px; width: 100%; outline: none; }
-    .modal-submit { background: var(--green-btn); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: 800; font-size: 14px; cursor: pointer; }
-    .hash-box { background: #111318; border: 1px solid #303642; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; word-break: break-all; color: #4ade80; }
-
-    @media (max-width: 960px) {
-      .workspace { grid-template-columns: 1fr; }
-      .bets-sidebar { order: 2; max-height: 360px; }
+    /* Privacy Blur Mask for Nigerian Players */
+    .blur-mask {
+      filter: blur(3.2px);
+      opacity: 0.78;
+      display: inline-block;
+      padding: 0 1px;
+      pointer-events: none;
     }
-    @media (max-width: 640px) {
-      .bet-panels-grid { grid-template-columns: 1fr; }
-      .center-mult { font-size: 48px; }
+
+    /* Tactile 3D Casino Buttons */
+    .btn-bet-green {
+      background: linear-gradient(180deg, #32c60e 0%, #249608 100%);
+      border: 1px solid #4be324;
+      box-shadow: 0 4px 16px rgba(40, 169, 9, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      transition: all 0.12s ease;
+    }
+    .btn-bet-green:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+    .btn-bet-green:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn-cashout-amber {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+      border: 1px solid #fcd34d;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      animation: pulseAmber 1.2s infinite alternate;
+      transition: all 0.1s ease;
+    }
+    .btn-cashout-amber:hover {
+      filter: brightness(1.08);
+    }
+    .btn-cashout-amber:active {
+      transform: scale(0.98);
+    }
+
+    .btn-cancel-red {
+      background: linear-gradient(180deg, #e11d48 0%, #be123c 100%);
+      border: 1px solid #fb7185;
+      box-shadow: 0 4px 16px rgba(225, 29, 72, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: all 0.12s ease;
+    }
+    .btn-cancel-red:hover {
+      filter: brightness(1.08);
+    }
+
+    @keyframes pulseAmber {
+      from { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.42); }
+      to { box-shadow: 0 4px 26px rgba(245, 158, 11, 0.78); }
+    }
+
+    /* Toggle Switch */
+    .toggle-track {
+      width: 38px;
+      height: 20px;
+      background: #272c38;
+      border-radius: 9999px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border: 1px solid #383f50;
+    }
+    .toggle-track.active {
+      background: #28a909;
+      border-color: #4be324;
+    }
+    .toggle-thumb {
+      width: 14px;
+      height: 14px;
+      background: #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s ease;
+    }
+    .toggle-track.active .toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    /* Toast Slide Animation */
+    @keyframes toastIn {
+      0% { opacity: 0; transform: translate(-50%, -18px) scale(0.95); }
+      100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+    .toast-banner {
+      animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-  <!-- PLUGBET Top Header -->
-  <header class="navbar">
-    <div class="nav-left">
-      <div class="brand-logo">PLUGBET <span class="brand-bolt">NG</span></div>
-      <div class="nav-links">
-        <span>Sports</span>
-        <span class="active">Aviator<span class="hot-badge">HOT</span></span>
-        <span>Live Betting</span>
-        <span>Instant Football</span>
-        <span>Jackpot</span>
+  <!-- 1. TOP SPORTYBET-STYLE RED NAVIGATION HEADER -->
+  <header class="bg-[#e41827] text-white sticky top-0 z-50 shadow-lg border-b border-red-800">
+    <div class="max-w-[1440px] mx-auto px-3 sm:px-5 h-14 flex items-center justify-between gap-2">
+      <!-- Brand + Navigation Tabs -->
+      <div class="flex items-center gap-3 min-w-0">
+        <button onclick="switchMainPort('aviator')" class="flex items-center gap-2 shrink-0 cursor-pointer text-left">
+          <div class="w-8 h-8 rounded-lg bg-white text-[#e41827] font-black text-lg flex items-center justify-center shadow">P</div>
+          <div class="leading-none">
+            <div class="font-black tracking-tight text-base sm:text-lg">PLUG<span class="text-[#ffd000]">BET</span></div>
+            <div class="text-[9px] font-extrabold tracking-widest text-white/80 uppercase">NIGERIA • NG</div>
+          </div>
+        </button>
+
+        <nav id="desktopPortNav" class="hidden md:flex items-center gap-1.5 text-xs font-extrabold whitespace-nowrap">
+          <button id="nav-aviator" onclick="switchMainPort('aviator')" class="px-3 py-1.5 rounded bg-white text-[#e41827] font-black shadow-sm flex items-center gap-1 cursor-pointer transition">
+            <span>✈️</span> Aviator <span class="bg-[#ffd000] text-black text-[9px] font-black px-1 rounded">HOT</span>
+          </button>
+          <button id="nav-live" onclick="switchMainPort('live')" class="px-2.5 py-1.5 rounded hover:bg-black/15 text-white transition flex items-center gap-1 cursor-pointer">
+            <span>⚽</span> Live Betting
+          </button>
+          <button id="nav-instant" onclick="switchMainPort('instant')" class="px-2.5 py-1.5 rounded hover:bg-black/15 text-white transition flex items-center gap-1 cursor-pointer">
+            <span>⚡</span> Instant Football
+          </button>
+          <button id="nav-jackpot" onclick="switchMainPort('jackpot')" class="px-2.5 py-1.5 rounded hover:bg-black/15 text-white transition flex items-center gap-1 cursor-pointer">
+            <span>🏆</span> Jackpot
+          </button>
+          <button id="nav-cineflow" onclick="switchMainPort('cineflow')" class="px-2.5 py-1.5 rounded bg-black/25 hover:bg-black/40 border border-[#ffd000]/60 text-[#ffd000] transition flex items-center gap-1 cursor-pointer">
+            <span>🎬</span> CineFlow <span class="bg-[#28a909] text-white text-[9px] font-black px-1 rounded">EARN</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Right Wallet & Utility Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <!-- Balance Pill -->
+        <div onclick="openCashier('deposit')" title="Click to Top Up NGN Wallet" class="bg-black/25 hover:bg-black/35 transition px-2.5 sm:px-3.5 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer border border-white/15">
+          <span class="text-[11px] font-bold text-white/80">NGN</span>
+          <span id="headerBalance" class="font-mono-num font-black text-xs sm:text-sm text-[#ffd000]">50,000.00</span>
+        </div>
+
+        <!-- Deposit / Withdraw Buttons -->
+        <button onclick="openCashier('deposit')" class="bg-[#28a909] hover:bg-[#31c40e] text-white text-xs font-extrabold px-2.5 sm:px-3.5 py-2 rounded-lg shadow transition cursor-pointer">
+          Deposit
+        </button>
+        <button onclick="openCashier('withdraw')" class="hidden sm:inline-flex bg-black/25 hover:bg-black/40 text-white text-xs font-extrabold px-3 py-2 rounded-lg border border-white/15 transition cursor-pointer">
+          Withdraw
+        </button>
+
+        <!-- SFX Sound Toggle -->
+        <button id="sfxToggleBtn" onclick="toggleSound()" title="Toggle Web Audio Sound Effects" class="bg-black/25 hover:bg-black/40 text-white text-xs font-bold px-2.5 py-2 rounded-lg border border-white/15 transition cursor-pointer flex items-center gap-1">
+          <span id="sfxIcon">🔊</span>
+          <span class="hidden lg:inline">SFX</span>
+        </button>
+
+        <!-- Provably Fair Modal Trigger -->
+        <button onclick="openFairModal()" title="Verify SHA-256 Provably Fair Seed" class="bg-black/25 hover:bg-black/40 text-white text-xs font-bold px-2.5 py-2 rounded-lg border border-white/15 transition cursor-pointer flex items-center gap-1">
+          <span>🛡️</span>
+          <span class="hidden lg:inline">Provably Fair</span>
+        </button>
       </div>
     </div>
-    <div class="nav-right">
-      <div class="top-balance" onclick="fetchBalance()" title="Refresh NGN Balance">
-        NGN <span id="topBalance">0.00</span> ↻
-      </div>
-      <button class="nav-btn green" onclick="openCashier('deposit')">Deposit</button>
-      <button class="nav-btn" onclick="openCashier('withdraw')">Withdraw</button>
-      <div id="guestActions" style="display:flex; gap:6px;">
-        <button class="nav-btn" onclick="openModal('loginModal')">Login</button>
-        <button class="nav-btn gold" onclick="openModal('registerModal')">Register</button>
-      </div>
-      <div id="userActions" style="display:none; align-items:center; gap:8px;">
-        <span id="navUsername" style="font-size:12px;">Account</span>
-        <button class="nav-btn" onclick="logout()">Logout</button>
-      </div>
+
+    <!-- Mobile Port Navigation Strip -->
+    <div class="md:hidden bg-[#b60f1c] border-t border-white/10 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[11px] font-extrabold">
+      <button id="mnav-aviator" onclick="switchMainPort('aviator')" class="px-2.5 py-1 rounded bg-white text-[#e41827] shrink-0 cursor-pointer">✈️ Aviator HOT</button>
+      <button id="mnav-live" onclick="switchMainPort('live')" class="px-2.5 py-1 rounded bg-black/20 text-white shrink-0 cursor-pointer">⚽ Live Betting</button>
+      <button id="mnav-instant" onclick="switchMainPort('instant')" class="px-2.5 py-1 rounded bg-black/20 text-white shrink-0 cursor-pointer">⚡ Instant Football</button>
+      <button id="mnav-jackpot" onclick="switchMainPort('jackpot')" class="px-2.5 py-1 rounded bg-black/20 text-white shrink-0 cursor-pointer">🏆 Jackpot</button>
+      <button id="mnav-cineflow" onclick="switchMainPort('cineflow')" class="px-2.5 py-1 rounded bg-black/30 text-[#ffd000] border border-[#ffd000]/40 shrink-0 cursor-pointer">🎬 CineFlow EARN</button>
     </div>
   </header>
 
-  <main class="workspace">
-    <!-- Left Sidebar: Live Nigerian Bets -->
-    <aside class="bets-sidebar">
-      <div class="sidebar-tabs">
-        <button class="s-tab active" id="tabAllBets" onclick="switchFeedTab('all')">All Bets</button>
-        <button class="s-tab" id="tabMyBets" onclick="switchFeedTab('my')">My Bets</button>
-        <button class="s-tab" id="tabTopWins" onclick="switchFeedTab('top')">Top Wins</button>
-      </div>
-      <div class="sidebar-stats">
-        <span>Active Flyers: <strong style="color:#fff;" id="activeCount">28</strong></span>
-        <span>Round Pool: <strong style="color:#ffd000;" id="roundPoolText">NGN 148,500</strong></span>
-      </div>
-      <div class="bets-list" id="betsListContainer"></div>
-    </aside>
+  <!-- Floating Toast Container -->
+  <div id="toastContainer" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-[92%] max-w-md"></div>
 
-    <!-- Right Column: Flight Canvas + Dual Bet Panels -->
-    <section class="game-column">
-      <div class="history-bar">
-        <div class="history-pills" id="historyPills">
-          <span class="h-pill h-purple">3.42x</span>
-          <span class="h-pill h-blue">1.28x</span>
-          <span class="h-pill h-pink">14.80x</span>
-          <span class="h-pill h-blue">1.85x</span>
-          <span class="h-pill h-purple">4.10x</span>
-          <span class="h-pill h-blue">1.09x</span>
-          <span class="h-pill h-purple">6.75x</span>
+  <!-- PORT 1: AVIATOR HOT WORKSPACE -->
+  <main id="port-aviator" class="flex-1 max-w-[1440px] w-full mx-auto p-2.5 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+
+    <!-- LEFT COLUMN: LIVE NIGERIAN PLAYERS BETS FEED (4 cols on desktop, order-2 on mobile) -->
+    <section class="lg:col-span-4 order-2 lg:order-1 bg-[#171a21] border border-[#262b36] rounded-2xl flex flex-col overflow-hidden h-[460px] lg:h-[670px] shadow-xl">
+      <!-- Top Feed Tabs + Live Stats -->
+      <div class="p-3 border-b border-[#262b36] bg-[#13161d]">
+        <div class="grid grid-cols-3 bg-[#0e1015] p-1 rounded-xl border border-[#262b36] text-xs font-extrabold">
+          <button id="feedTabAll" onclick="switchFeedTab('all')" class="py-1.5 rounded-lg bg-[#262b36] text-white transition cursor-pointer">All Bets</button>
+          <button id="feedTabMy" onclick="switchFeedTab('my')" class="py-1.5 rounded-lg text-gray-400 hover:text-white transition cursor-pointer">My Bets</button>
+          <button id="feedTabTop" onclick="switchFeedTab('top')" class="py-1.5 rounded-lg text-gray-400 hover:text-white transition cursor-pointer">Top Wins</button>
         </div>
-        <div style="display:flex; gap:6px; flex-shrink:0;">
-          <button class="nav-btn" id="sfxToggleBtn" onclick="toggleSfx()">🔊 SFX</button>
-          <button class="nav-btn" onclick="openModal('fairModal')">🛡️ Provably Fair</button>
-        </div>
-      </div>
 
-      <!-- HTML5 Canvas Flight Arena -->
-      <div class="arena-card">
-        <canvas id="aviatorCanvas"></canvas>
-
-        <div class="win-toast" id="winToast"></div>
-
-        <div class="arena-overlay">
-          <div class="boarding-box" id="boardingBox">
-            <div class="boarding-title">WAITING FOR NEXT FLIGHT</div>
-            <div class="progress-track"><div class="progress-fill" id="boardingFill"></div></div>
-            <div style="font-size:11px; color:#9ca3af; font-weight:700;" id="boardingSub">Place your NGN bets now</div>
+        <!-- Live Round Stats Bar -->
+        <div class="flex items-center justify-between mt-3 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#28a909] animate-pulse"></span>
+            <span class="text-xs font-extrabold text-gray-300">ALL BETS: <span id="liveBetsCount" class="text-white font-mono-num">248</span></span>
           </div>
-
-          <div class="flew-banner" id="flewBanner">FLEW AWAY!</div>
-          <div class="center-mult" id="centerMult" style="display:none;">1.00x</div>
+          <div class="text-xs font-bold text-gray-400">
+            Total Payout: <span id="liveTotalPayout" class="text-[#28a909] font-mono-num font-extrabold">NGN 0.00</span>
+          </div>
         </div>
       </div>
 
-      <!-- Dual Independent Bet Panels -->
-      <div class="bet-panels-grid">
-        <!-- Panel 1 -->
-        <div class="bet-panel" id="panel-1">
-          <div class="panel-top-row">
-            <div class="mode-switch">
-              <button class="mode-btn active" id="p1-mode-bet" onclick="setPanelMode(1, 'bet')">Bet</button>
-              <button class="mode-btn" id="p1-mode-auto" onclick="setPanelMode(1, 'auto')">Auto</button>
+      <!-- Column Headers -->
+      <div class="grid grid-cols-12 px-3.5 py-2 text-[11px] font-bold text-gray-400 border-b border-[#262b36]/70 bg-[#151820]">
+        <div class="col-span-5">Player / Line</div>
+        <div class="col-span-3 text-right">Bet (NGN)</div>
+        <div class="col-span-1 text-center">X</div>
+        <div class="col-span-3 text-right">Cash Out</div>
+      </div>
+
+      <!-- Scrollable Bets List -->
+      <div id="betsFeedList" class="flex-1 overflow-y-auto divide-y divide-[#262b36]/40 px-2 py-1 space-y-1"></div>
+    </section>
+
+    <!-- RIGHT COLUMN: ROUND HISTORY + FLIGHT ARENA + DUAL BET PANELS (8 cols on desktop, order-1 on mobile) -->
+    <section class="lg:col-span-8 order-1 lg:order-2 flex flex-col gap-3">
+
+      <!-- 2. ROUND HISTORY RIBBON -->
+      <div class="bg-[#171a21] border border-[#262b36] rounded-xl px-3 py-2 flex items-center gap-2">
+        <span class="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <span>🕒</span> History
+        </span>
+        <div id="historyRibbon" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 py-0.5">
+          <!-- Populated dynamically -->
+        </div>
+        <button onclick="openFairModal()" class="shrink-0 bg-[#222733] hover:bg-[#2d3342] text-gray-300 text-[11px] font-bold px-2.5 py-1 rounded-lg border border-[#323846] cursor-pointer">
+          Round #<span id="roundNumberBadge" class="font-mono-num text-white">84920</span>
+        </button>
+      </div>
+
+      <!-- 3. HTML5 CANVAS AVIATOR FLIGHT ARENA -->
+      <div class="relative bg-[#0e1015] border border-[#262b36] rounded-2xl overflow-hidden shadow-2xl h-[300px] sm:h-[370px] w-full">
+        <canvas id="aviatorCanvas" class="w-full h-full block"></canvas>
+
+        <!-- Top-Left Provably Fair & Live Status Pill -->
+        <div class="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+          <div class="bg-black/55 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[11px] font-bold text-gray-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>LAGOS-EDGE-01</span>
+          </div>
+          <div id="liveMultiplierBadge" class="hidden bg-[#e41827]/20 border border-[#e41827]/50 px-2.5 py-1 rounded-full text-[11px] font-extrabold text-red-300">
+            IN FLIGHT
+          </div>
+        </div>
+
+        <!-- Center Overlay: Multiplier Readout / Boarding Countdown / Flew Away Banner -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-4 text-center">
+
+          <!-- PHASE A: WAITING / BOARDING OVERLAY -->
+          <div id="waitingOverlay" class="flex flex-col items-center gap-3 bg-black/55 backdrop-blur-sm px-6 py-5 rounded-2xl border border-white/10 max-w-xs w-full">
+            <div class="w-11 h-11 rounded-full bg-[#e41827]/20 border border-[#e41827] flex items-center justify-center text-xl animate-bounce">
+              ✈️
             </div>
-            <span style="font-size:11px; color:#9ca3af; font-weight:800;">PANEL 1</span>
+            <div class="text-xs sm:text-sm font-black tracking-widest uppercase text-white">
+              WAITING FOR NEXT ROUND
+            </div>
+            <!-- Countdown Progress Bar -->
+            <div class="w-full h-2.5 bg-[#232834] rounded-full overflow-hidden border border-white/10">
+              <div id="countdownBar" class="h-full bg-gradient-to-r from-[#e41827] to-[#ff4d5a] transition-all duration-75" style="width: 100%"></div>
+            </div>
+            <div class="text-[11px] font-mono-num text-gray-300 font-bold">
+              Takeoff in <span id="countdownSeconds" class="text-[#ffd000]">5.0s</span>
+            </div>
           </div>
 
-          <div class="panel-main">
-            <div class="stake-controls">
-              <div class="stepper">
-                <button class="step-btn" onclick="stepStake(1, -100)">−</button>
-                <input type="number" id="p1-stake" value="500" min="50" step="50" onchange="syncStakeLabel(1)" />
-                <button class="step-btn" onclick="stepStake(1, 100)">+</button>
+          <!-- PHASE B & C: FLYING / FLEW AWAY MULTIPLIER -->
+          <div id="flightOverlay" class="hidden flex-col items-center">
+            <div id="flewAwayLabel" class="hidden text-base sm:text-xl font-black tracking-widest uppercase text-[#ff3b49] drop-shadow-[0_2px_12px_rgba(228,24,39,0.8)] mb-1">
+              FLEW AWAY!
+            </div>
+            <div id="multiplierDisplay" class="font-mono-num font-black text-5xl sm:text-7xl tracking-tight text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)]">
+              1.00x
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. DUAL INDEPENDENT BET PANELS (PANEL 1 & PANEL 2) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        <!-- PANEL 1 -->
+        <div id="betPanel1" class="bg-[#171a21] border border-[#262b36] rounded-2xl p-3.5 flex flex-col gap-3 shadow-lg">
+          <!-- Mode Tabs: Bet vs Auto -->
+          <div class="flex items-center justify-between">
+            <div class="grid grid-cols-2 bg-[#0e1015] p-1 rounded-full border border-[#262b36] w-44 text-xs font-extrabold">
+              <button id="p1TabBet" onclick="setPanelMode(1, 'bet')" class="py-1 rounded-full bg-[#262b36] text-white transition cursor-pointer">Bet</button>
+              <button id="p1TabAuto" onclick="setPanelMode(1, 'auto')" class="py-1 rounded-full text-gray-400 hover:text-white transition cursor-pointer">Auto</button>
+            </div>
+            <span id="p1StatusTag" class="text-[11px] font-extrabold text-gray-400">PANEL 1</span>
+          </div>
+
+          <!-- Stake Input + Primary Action Button Row -->
+          <div class="grid grid-cols-12 gap-2.5 items-stretch">
+            <!-- Left Stake Box -->
+            <div class="col-span-5 flex flex-col gap-1.5">
+              <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl px-2 py-1.5 flex items-center justify-between">
+                <button onclick="adjustStake(1, -100)" class="w-6 h-6 rounded-full bg-[#222733] hover:bg-[#313849] text-white font-black text-sm flex items-center justify-center cursor-pointer">−</button>
+                <input id="p1StakeInput" type="number" value="500" min="50" max="500000" step="50" onchange="sanitizeStake(1)" oninput="updatePanelButtons()" class="w-16 sm:w-20 bg-transparent text-center font-mono-num font-black text-sm text-white focus:outline-none" />
+                <button onclick="adjustStake(1, 100)" class="w-6 h-6 rounded-full bg-[#222733] hover:bg-[#313849] text-white font-black text-sm flex items-center justify-center cursor-pointer">+</button>
               </div>
-              <div class="presets-grid">
-                <button onclick="setStake(1, 100)">₦100</button>
-                <button onclick="setStake(1, 500)">₦500</button>
-                <button onclick="setStake(1, 1000)">₦1,000</button>
-                <button onclick="setStake(1, 5000)">₦5,000</button>
+              <!-- Quick NGN Presets -->
+              <div class="grid grid-cols-2 gap-1 text-[11px] font-mono-num font-bold">
+                <button onclick="setStake(1, 100)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦100</button>
+                <button onclick="setStake(1, 500)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦500</button>
+                <button onclick="setStake(1, 1000)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦1,000</button>
+                <button onclick="setStake(1, 5000)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦5,000</button>
               </div>
             </div>
 
-            <button class="action-btn state-bet" id="p1-btn" onclick="handlePanelAction(1)">
-              <span class="btn-label" id="p1-btn-label">BET</span>
-              <span class="btn-sub" id="p1-btn-sub">NGN 500.00</span>
-            </button>
+            <!-- Right Primary Action Button -->
+            <div class="col-span-7 flex">
+              <button id="p1ActionBtn" onclick="handlePanelAction(1)" class="w-full rounded-2xl btn-bet-green text-white flex flex-col items-center justify-center p-2 cursor-pointer">
+                <span id="p1BtnTitle" class="text-base sm:text-lg font-black tracking-wide uppercase leading-tight">BET</span>
+                <span id="p1BtnSub" class="font-mono-num text-xs sm:text-sm font-extrabold opacity-95">500.00 NGN</span>
+              </button>
+            </div>
           </div>
 
-          <div class="auto-bar" id="p1-autobar">
-            <label class="auto-group"><input type="checkbox" id="p1-autobet" /> Auto Bet</label>
-            <div class="auto-group">
-              <label><input type="checkbox" id="p1-autocash" checked /> Auto Cash Out</label>
-              <input type="number" class="auto-input" id="p1-target" value="2.00" min="1.10" step="0.10" />x
+          <!-- Auto-Bet & Auto-Cashout Controls -->
+          <div id="p1AutoRow" class="hidden pt-2.5 border-t border-[#262b36] flex items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2">
+              <div id="p1AutoBetToggle" onclick="toggleAutoBet(1)" class="toggle-track">
+                <div class="toggle-thumb"></div>
+              </div>
+              <span class="font-bold text-gray-300">Auto Bet</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-gray-300">Auto Cash Out</span>
+              <div id="p1AutoCashToggle" onclick="toggleAutoCash(1)" class="toggle-track">
+                <div class="toggle-thumb"></div>
+              </div>
+              <div class="bg-[#0e1015] border border-[#2c3240] rounded-lg px-2 py-1 flex items-center gap-1">
+                <input id="p1AutoCashInput" type="number" value="2.00" min="1.05" max="1000" step="0.10" class="w-12 bg-transparent font-mono-num font-extrabold text-white text-right focus:outline-none" />
+                <span class="text-gray-400 font-bold">x</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Panel 2 -->
-        <div class="bet-panel" id="panel-2">
-          <div class="panel-top-row">
-            <div class="mode-switch">
-              <button class="mode-btn active" id="p2-mode-bet" onclick="setPanelMode(2, 'bet')">Bet</button>
-              <button class="mode-btn" id="p2-mode-auto" onclick="setPanelMode(2, 'auto')">Auto</button>
+        <!-- PANEL 2 -->
+        <div id="betPanel2" class="bg-[#171a21] border border-[#262b36] rounded-2xl p-3.5 flex flex-col gap-3 shadow-lg">
+          <!-- Mode Tabs: Bet vs Auto -->
+          <div class="flex items-center justify-between">
+            <div class="grid grid-cols-2 bg-[#0e1015] p-1 rounded-full border border-[#262b36] w-44 text-xs font-extrabold">
+              <button id="p2TabBet" onclick="setPanelMode(2, 'bet')" class="py-1 rounded-full bg-[#262b36] text-white transition cursor-pointer">Bet</button>
+              <button id="p2TabAuto" onclick="setPanelMode(2, 'auto')" class="py-1 rounded-full text-gray-400 hover:text-white transition cursor-pointer">Auto</button>
             </div>
-            <span style="font-size:11px; color:#9ca3af; font-weight:800;">PANEL 2</span>
+            <span id="p2StatusTag" class="text-[11px] font-extrabold text-gray-400">PANEL 2</span>
           </div>
 
-          <div class="panel-main">
-            <div class="stake-controls">
-              <div class="stepper">
-                <button class="step-btn" onclick="stepStake(2, -100)">−</button>
-                <input type="number" id="p2-stake" value="1000" min="50" step="50" onchange="syncStakeLabel(2)" />
-                <button class="step-btn" onclick="stepStake(2, 100)">+</button>
+          <!-- Stake Input + Primary Action Button Row -->
+          <div class="grid grid-cols-12 gap-2.5 items-stretch">
+            <!-- Left Stake Box -->
+            <div class="col-span-5 flex flex-col gap-1.5">
+              <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl px-2 py-1.5 flex items-center justify-between">
+                <button onclick="adjustStake(2, -100)" class="w-6 h-6 rounded-full bg-[#222733] hover:bg-[#313849] text-white font-black text-sm flex items-center justify-center cursor-pointer">−</button>
+                <input id="p2StakeInput" type="number" value="1000" min="50" max="500000" step="50" onchange="sanitizeStake(2)" oninput="updatePanelButtons()" class="w-16 sm:w-20 bg-transparent text-center font-mono-num font-black text-sm text-white focus:outline-none" />
+                <button onclick="adjustStake(2, 100)" class="w-6 h-6 rounded-full bg-[#222733] hover:bg-[#313849] text-white font-black text-sm flex items-center justify-center cursor-pointer">+</button>
               </div>
-              <div class="presets-grid">
-                <button onclick="setStake(2, 200)">₦200</button>
-                <button onclick="setStake(2, 1000)">₦1,000</button>
-                <button onclick="setStake(2, 2500)">₦2,500</button>
-                <button onclick="setStake(2, 10000)">₦10,000</button>
+              <!-- Quick NGN Presets -->
+              <div class="grid grid-cols-2 gap-1 text-[11px] font-mono-num font-bold">
+                <button onclick="setStake(2, 100)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦100</button>
+                <button onclick="setStake(2, 500)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦500</button>
+                <button onclick="setStake(2, 1000)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦1,000</button>
+                <button onclick="setStake(2, 5000)" class="bg-[#20242e] hover:bg-[#2b313e] text-gray-300 py-1 rounded-lg border border-[#2c3240] cursor-pointer">₦5,000</button>
               </div>
             </div>
 
-            <button class="action-btn state-bet" id="p2-btn" onclick="handlePanelAction(2)">
-              <span class="btn-label" id="p2-btn-label">BET</span>
-              <span class="btn-sub" id="p2-btn-sub">NGN 1,000.00</span>
-            </button>
+            <!-- Right Primary Action Button -->
+            <div class="col-span-7 flex">
+              <button id="p2ActionBtn" onclick="handlePanelAction(2)" class="w-full rounded-2xl btn-bet-green text-white flex flex-col items-center justify-center p-2 cursor-pointer">
+                <span id="p2BtnTitle" class="text-base sm:text-lg font-black tracking-wide uppercase leading-tight">BET</span>
+                <span id="p2BtnSub" class="font-mono-num text-xs sm:text-sm font-extrabold opacity-95">1,000.00 NGN</span>
+              </button>
+            </div>
           </div>
 
-          <div class="auto-bar" id="p2-autobar">
-            <label class="auto-group"><input type="checkbox" id="p2-autobet" /> Auto Bet</label>
-            <div class="auto-group">
-              <label><input type="checkbox" id="p2-autocash" checked /> Auto Cash Out</label>
-              <input type="number" class="auto-input" id="p2-target" value="3.50" min="1.10" step="0.10" />x
+          <!-- Auto-Bet & Auto-Cashout Controls -->
+          <div id="p2AutoRow" class="hidden pt-2.5 border-t border-[#262b36] flex items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2">
+              <div id="p2AutoBetToggle" onclick="toggleAutoBet(2)" class="toggle-track">
+                <div class="toggle-thumb"></div>
+              </div>
+              <span class="font-bold text-gray-300">Auto Bet</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-gray-300">Auto Cash Out</span>
+              <div id="p2AutoCashToggle" onclick="toggleAutoCash(2)" class="toggle-track">
+                <div class="toggle-thumb"></div>
+              </div>
+              <div class="bg-[#0e1015] border border-[#2c3240] rounded-lg px-2 py-1 flex items-center gap-1">
+                <input id="p2AutoCashInput" type="number" value="2.50" min="1.05" max="1000" step="0.10" class="w-12 bg-transparent font-mono-num font-extrabold text-white text-right focus:outline-none" />
+                <span class="text-gray-400 font-bold">x</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </section>
   </main>
 
-  <!-- Register Modal -->
-  <div class="modal-backdrop" id="registerModal">
-    <div class="modal">
-      <div class="modal-head"><span>Join PLUGBET (NGN 50,000 Bonus)</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
-      <input type="text" id="regUser" placeholder="Username (e.g. Chinedu_NG)" />
-      <input type="password" id="regPass" placeholder="Password" />
-      <button class="modal-submit" onclick="registerUser()">Create Account</button>
+  <!-- PORT 2: LIVE BETTING ARENA -->
+  <section id="port-live" class="hidden flex-1 max-w-[1440px] w-full mx-auto p-3 sm:p-5 grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      <div class="bg-[#171a21] border border-[#262b36] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+            <h2 class="text-lg font-black">Live In-Play Football</h2>
+          </div>
+          <p class="text-xs text-gray-400">Real-time odds refreshed every 3 seconds • Instant NGN settlement</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-bold">
+          <span class="bg-[#222733] px-3 py-1.5 rounded-lg border border-[#2f3646] text-emerald-400">6 Live Matches</span>
+          <button onclick="settleLiveSlip()" class="bg-[#28a909] hover:bg-[#31c40e] text-white px-3 py-1.5 rounded-lg font-extrabold cursor-pointer">⚡ Simulate Full-Time</button>
+        </div>
+      </div>
+
+      <div id="liveMatchesList" class="flex flex-col gap-2.5"></div>
+    </div>
+
+    <!-- Interactive Bet Slip -->
+    <aside class="lg:col-span-4 bg-[#171a21] border border-[#262b36] rounded-2xl p-4 flex flex-col gap-3 h-fit lg:sticky lg:top-[72px]">
+      <div class="flex items-center justify-between border-b border-[#262b36] pb-3">
+        <div class="flex items-center gap-2">
+          <span class="bg-[#e41827] text-white text-xs font-black px-2 py-0.5 rounded">SLIP</span>
+          <h3 class="font-black text-sm">PLUGBET Bet Slip</h3>
+        </div>
+        <button onclick="clearBetSlip()" class="text-xs text-gray-400 hover:text-red-400 font-bold cursor-pointer">Clear All</button>
+      </div>
+
+      <div id="betSlipItems" class="flex flex-col gap-2 max-h-72 overflow-y-auto">
+        <div class="text-center text-xs text-gray-500 py-8 font-bold">Tap any live odds (1 / X / 2 / O2.5) to build your ticket.</div>
+      </div>
+
+      <div class="bg-[#0e1015] border border-[#262b36] rounded-xl p-3 flex flex-col gap-2 text-xs">
+        <div class="flex justify-between font-bold text-gray-400">
+          <span>Total Odds</span>
+          <span id="slipTotalOdds" class="font-mono-num text-[#ffd000] font-black">1.00</span>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-bold text-gray-400">Stake (NGN)</span>
+          <input id="slipStakeInput" type="number" value="1000" min="50" step="100" oninput="renderBetSlip()" class="w-28 bg-[#171a21] border border-[#2c3240] rounded-lg px-2.5 py-1.5 text-right font-mono-num font-black text-white focus:outline-none" />
+        </div>
+        <div class="flex justify-between font-extrabold text-sm pt-1 border-t border-[#262b36]">
+          <span>Potential Win</span>
+          <span id="slipPotentialWin" class="font-mono-num text-[#34e815]">NGN 0.00</span>
+        </div>
+      </div>
+
+      <button onclick="placeLiveBet()" class="w-full py-3 rounded-xl btn-bet-green font-black text-sm text-white cursor-pointer">
+        PLACE LIVE BET
+      </button>
+
+      <!-- Active Tickets -->
+      <div class="border-t border-[#262b36] pt-3">
+        <div class="text-[11px] font-extrabold text-gray-400 uppercase mb-2">Open Tickets</div>
+        <div id="openTicketsList" class="flex flex-col gap-2 text-xs text-gray-500 font-bold">No open live tickets.</div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- PORT 3: INSTANT FOOTBALL SIMULATOR -->
+  <section id="port-instant" class="hidden flex-1 max-w-[1440px] w-full mx-auto p-3 sm:p-5 grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="lg:col-span-7 bg-[#171a21] border border-[#262b36] rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-black flex items-center gap-2"><span>⚡</span> Instant Virtual Football</h2>
+          <p class="text-xs text-gray-400">90-minute match simulated in 8 seconds • Instant NGN payouts</p>
+        </div>
+        <span id="vfMatchClock" class="font-mono-num text-sm font-black bg-[#e41827]/20 border border-[#e41827] text-red-300 px-3 py-1 rounded-full">00'</span>
+      </div>
+
+      <!-- Virtual Pitch Scoreboard -->
+      <div class="bg-gradient-to-b from-[#0f2e19] to-[#0a1f11] border border-emerald-500/30 rounded-2xl p-5 flex flex-col items-center gap-3 relative overflow-hidden">
+        <div class="text-[11px] font-extrabold uppercase tracking-widest text-emerald-300/80">PLUGBET PREMIER VIRTUAL CUP</div>
+        <div class="w-full grid grid-cols-3 items-center text-center gap-2">
+          <div>
+            <div id="vfHomeName" class="font-black text-base sm:text-xl text-white">Arsenal</div>
+            <div class="text-[11px] text-emerald-400 font-bold">HOME</div>
+          </div>
+          <div class="bg-black/60 border border-white/15 rounded-xl py-2 px-4">
+            <div id="vfScoreboard" class="font-mono-num font-black text-3xl sm:text-4xl text-[#ffd000]">0 - 0</div>
+          </div>
+          <div>
+            <div id="vfAwayName" class="font-black text-base sm:text-xl text-white">Chelsea</div>
+            <div class="text-[11px] text-sky-400 font-bold">AWAY</div>
+          </div>
+        </div>
+        <div id="vfCommentary" class="text-xs font-bold text-emerald-200 bg-black/45 px-4 py-1.5 rounded-full border border-white/10">
+          Select a fixture & market, then press Kick Off!
+        </div>
+      </div>
+
+      <!-- Fixture Picker -->
+      <div>
+        <div class="text-xs font-extrabold text-gray-400 uppercase mb-2">Choose Virtual Fixture</div>
+        <div id="vfFixtureGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+      </div>
+    </div>
+
+    <!-- Instant Football Bet Console -->
+    <aside class="lg:col-span-5 bg-[#171a21] border border-[#262b36] rounded-2xl p-4 sm:p-5 flex flex-col gap-4 h-fit">
+      <h3 class="font-black text-base border-b border-[#262b36] pb-2.5">Match Market & Kick Off</h3>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button id="vfPickHome" onclick="selectVfPick('HOME')" class="py-3 rounded-xl bg-[#262b36] border-2 border-[#28a909] text-white font-black text-xs flex flex-col items-center cursor-pointer">
+          <span>HOME (1)</span>
+          <span id="vfOddHome" class="font-mono-num text-[#ffd000] text-sm mt-0.5">2.10</span>
+        </button>
+        <button id="vfPickDraw" onclick="selectVfPick('DRAW')" class="py-3 rounded-xl bg-[#0e1015] border border-[#2c3240] text-gray-300 font-black text-xs flex flex-col items-center cursor-pointer">
+          <span>DRAW (X)</span>
+          <span id="vfOddDraw" class="font-mono-num text-[#ffd000] text-sm mt-0.5">3.25</span>
+        </button>
+        <button id="vfPickAway" onclick="selectVfPick('AWAY')" class="py-3 rounded-xl bg-[#0e1015] border border-[#2c3240] text-gray-300 font-black text-xs flex flex-col items-center cursor-pointer">
+          <span>AWAY (2)</span>
+          <span id="vfOddAway" class="font-mono-num text-[#ffd000] text-sm mt-0.5">3.10</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-gray-400">Stake Amount (NGN)</label>
+        <input id="vfStakeInput" type="number" value="1000" min="100" step="100" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3.5 py-2.5 font-mono-num font-black text-white focus:outline-none" />
+        <div class="grid grid-cols-4 gap-1.5 text-xs font-mono-num font-bold">
+          <button onclick="document.getElementById('vfStakeInput').value=200" class="bg-[#20242e] py-1.5 rounded-lg cursor-pointer">₦200</button>
+          <button onclick="document.getElementById('vfStakeInput').value=500" class="bg-[#20242e] py-1.5 rounded-lg cursor-pointer">₦500</button>
+          <button onclick="document.getElementById('vfStakeInput').value=2000" class="bg-[#20242e] py-1.5 rounded-lg cursor-pointer">₦2,000</button>
+          <button onclick="document.getElementById('vfStakeInput').value=5000" class="bg-[#20242e] py-1.5 rounded-lg cursor-pointer">₦5,000</button>
+        </div>
+      </div>
+
+      <button id="vfKickoffBtn" onclick="startInstantMatch()" class="w-full py-3.5 rounded-xl btn-bet-green font-black text-sm text-white cursor-pointer">
+        ⚡ KICK OFF MATCH
+      </button>
+
+      <div class="border-t border-[#262b36] pt-3">
+        <div class="text-[11px] font-extrabold text-gray-400 uppercase mb-2">Recent Virtual Results</div>
+        <div id="vfResultsLog" class="flex flex-col gap-1.5 text-xs text-gray-400"></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- PORT 4: NGN 10,000,000 MEGA JACKPOT -->
+  <section id="port-jackpot" class="hidden flex-1 max-w-[1440px] w-full mx-auto p-3 sm:p-5 grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="lg:col-span-8 bg-[#171a21] border border-[#262b36] rounded-2xl p-5 flex flex-col gap-4">
+      <div class="bg-gradient-to-r from-[#2c1228] via-[#3c1220] to-[#1d1424] border border-amber-400/40 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span class="bg-[#ffd000] text-black text-[10px] font-black px-2 py-0.5 rounded uppercase">PLUGBET SUPER 6</span>
+          <h2 class="text-2xl sm:text-3xl font-black text-white mt-1">NGN <span id="jackpotPoolAmount" class="font-mono-num text-[#ffd000]">10,458,200.00</span></h2>
+          <p class="text-xs text-gray-300 mt-1">Predict 6 fixtures for ₦200 per ticket • Instant consolation payouts for 4/6 & 5/6!</p>
+        </div>
+        <button onclick="quickPickJackpot()" class="bg-[#ffd000] hover:bg-amber-300 text-black font-black text-xs px-4 py-2.5 rounded-xl shrink-0 cursor-pointer">
+          🎲 Quick Pick All 6
+        </button>
+      </div>
+
+      <div id="jackpotFixturesList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-[#0e1015] border border-[#262b36] rounded-xl p-3.5">
+        <div class="text-xs font-bold text-gray-300">
+          Ticket Fee: <span class="font-mono-num text-[#ffd000] font-black">NGN 200.00</span> • Selected: <span id="jpSelectedCount" class="text-emerald-400 font-black">0/6</span>
+        </div>
+        <button onclick="submitJackpotTicket()" class="px-6 py-2.5 rounded-xl btn-bet-green font-black text-xs text-white cursor-pointer">
+          ENTER NGN 10M DRAW
+        </button>
+      </div>
+    </div>
+
+    <!-- Instant Jackpot Rain Vault -->
+    <aside class="lg:col-span-4 bg-[#171a21] border border-[#262b36] rounded-2xl p-5 flex flex-col gap-4 h-fit">
+      <div class="text-center">
+        <div class="text-4xl mb-2">💎</div>
+        <h3 class="font-black text-lg text-white">Instant Rain Vault</h3>
+        <p class="text-xs text-gray-400 mt-1">Crack the PLUGBET Vault for ₦500 and win up to ₦250,000 instantly.</p>
+      </div>
+      <div id="vaultDisplay" class="bg-[#0e1015] border border-[#2c3240] rounded-2xl p-5 text-center font-mono-num font-black text-2xl text-[#ffd000]">
+        ? ? ?
+      </div>
+      <button onclick="crackJackpotVault()" class="w-full py-3.5 rounded-xl btn-cashout-amber font-black text-sm text-white cursor-pointer">
+        🔓 CRACK VAULT (NGN 500)
+      </button>
+      <div id="vaultHistory" class="text-xs text-gray-400 flex flex-col gap-1.5 border-t border-[#262b36] pt-3">
+        <div class="font-extrabold text-gray-300">Recent Vault Hits:</div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- PORT 5: CINEFLOW AI STUDIO & EARN NOW HUB -->
+  <section id="port-cineflow" class="hidden flex-1 max-w-[1440px] w-full mx-auto p-3 sm:p-5 grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Left / Main Pipeline Studio -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+      <!-- CineFlow Hero Banner -->
+      <div class="bg-gradient-to-r from-[#14172b] via-[#1b1536] to-[#12192c] border border-indigo-500/40 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-indigo-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase">CINEFLOW AI ENGINE</span>
+            <span class="bg-[#28a909]/20 border border-[#28a909] text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded">EARN NOW ACTIVE</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white mt-1.5">Raw Footage → Viral 9:16 Clips → Instant NGN</h2>
+          <p class="text-xs text-indigo-200/80 mt-1">Automated Transcription & Translation • Intelligent 9:16 Reframing • Viral Hook & Caption Generation</p>
+        </div>
+        <div class="bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-right shrink-0">
+          <div class="text-[10px] text-gray-400 font-bold uppercase">Creator Earnings</div>
+          <div id="cfTotalEarned" class="font-mono-num text-lg font-black text-[#34e815]">NGN 0.00</div>
+        </div>
+      </div>
+
+      <!-- 3-Step AI Processing Controls -->
+      <div class="bg-[#171a21] border border-[#262b36] rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-extrabold text-gray-300 block mb-1.5">1. Source Footage / Big Win Replay</label>
+            <select id="cfSourceSelect" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3 py-2.5 text-xs font-bold text-white focus:outline-none">
+              <option value="aviator">✈️ Last PLUGBET Aviator Big Win Replay (14.8x Cashout)</option>
+              <option value="football">⚽ Instant Football 90' Last-Minute Winner Highlight</option>
+              <option value="podcast">🎙️ Creator Podcast / Raw Street Interview (16:9 Raw)</option>
+              <option value="promo">🔥 PLUGBET Referral Promo & Jackpot Breakdown</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-extrabold text-gray-300 block mb-1.5">2. Auto-Translation & Caption Language</label>
+            <select id="cfLangSelect" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3 py-2.5 text-xs font-bold text-white focus:outline-none">
+              <option value="English (Viral Nigerian Pidgin Blend)">English + Nigerian Pidgin Viral Hook</option>
+              <option value="English (Global High-Retention)">English (Global TikTok / Reels)</option>
+              <option value="French">French (West Africa Expansion)</option>
+              <option value="Spanish">Spanish (LATAM Creator Feed)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-extrabold text-gray-300 block mb-1.5">3. Custom Topic or Footage Notes (Optional)</label>
+          <input id="cfTopicInput" type="text" placeholder="e.g. Turned ₦1,000 into ₦24,500 on PLUGBET Aviator in 12 seconds!" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3.5 py-2.5 text-xs font-bold text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <!-- Pipeline Toggles -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-bold">
+          <div class="bg-[#0e1015] border border-indigo-500/30 rounded-xl p-2.5 flex items-center gap-2">
+            <span class="text-emerald-400">✔</span> Whisper Transcription
+          </div>
+          <div class="bg-[#0e1015] border border-indigo-500/30 rounded-xl p-2.5 flex items-center gap-2">
+            <span class="text-emerald-400">✔</span> Smart 9:16 Reframing
+          </div>
+          <div class="bg-[#0e1015] border border-indigo-500/30 rounded-xl p-2.5 flex items-center gap-2">
+            <span class="text-emerald-400">✔</span> Word-by-Word Captions
+          </div>
+        </div>
+
+        <button id="cfGenerateBtn" onclick="runCineFlowPipeline()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-black text-sm text-white shadow-lg cursor-pointer transition">
+          ⚡ GENERATE 9:16 VIRAL CLIP & HOOK
+        </button>
+
+        <!-- Progress Bar -->
+        <div id="cfProgressWrap" class="hidden flex-col gap-1.5">
+          <div class="flex justify-between text-[11px] font-bold text-indigo-300">
+            <span id="cfProgressStage">Running Whisper AI Transcription...</span>
+            <span id="cfProgressPct" class="font-mono-num">0%</span>
+          </div>
+          <div class="w-full h-2 bg-[#0e1015] rounded-full overflow-hidden border border-white/10">
+            <div id="cfProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CineFlow Monetization & Subscription Tiers (From Pitch Deck) -->
+      <div class="bg-[#171a21] border border-[#262b36] rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-black text-sm text-white">CineFlow SaaS Plans & Earn Now Bounties</h3>
+          <span class="text-[11px] font-bold text-indigo-300">Cloud-Native • Render + R2 + AI</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+          <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl p-3 flex flex-col justify-between gap-2">
+            <div>
+              <div class="font-black text-white">Starter Plan</div>
+              <div class="font-mono-num text-lg font-black text-indigo-400 mt-0.5">$29<span class="text-[11px] text-gray-400">/mo</span></div>
+              <p class="text-[11px] text-gray-400 mt-1">Basic viral clips, auto captions & 60 AI mins/mo.</p>
+            </div>
+            <button onclick="upgradeCineFlowPlan('Starter', 15000)" class="w-full py-2 rounded-lg bg-[#222733] hover:bg-[#2d3445] font-extrabold text-white cursor-pointer">Activate (₦15,000)</button>
+          </div>
+          <div class="bg-[#16132b] border border-indigo-500 rounded-xl p-3 flex flex-col justify-between gap-2 relative">
+            <span class="absolute -top-2 right-2 bg-[#ffd000] text-black text-[9px] font-black px-1.5 py-0.5 rounded">POPULAR</span>
+            <div>
+              <div class="font-black text-white">Pro Creator</div>
+              <div class="font-mono-num text-lg font-black text-[#ffd000] mt-0.5">$99<span class="text-[11px] text-gray-400">/mo</span></div>
+              <p class="text-[11px] text-gray-300 mt-1">Advanced AI, 9:16 reframing, 2x PLUGBET affiliate rev-share.</p>
+            </div>
+            <button onclick="upgradeCineFlowPlan('Pro', 45000)" class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-extrabold text-white cursor-pointer">Activate (₦45,000)</button>
+          </div>
+          <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl p-3 flex flex-col justify-between gap-2">
+            <div>
+              <div class="font-black text-white">Top-Up Minutes</div>
+              <div class="font-mono-num text-lg font-black text-emerald-400 mt-0.5">₦5,000</div>
+              <p class="text-[11px] text-gray-400 mt-1">Pay-per-minute add-on pack (+30 ultra-fast AI render mins).</p>
+            </div>
+            <button onclick="upgradeCineFlowPlan('Top-Up 30m', 5000)" class="w-full py-2 rounded-lg bg-[#28a909] hover:bg-[#31c40e] font-extrabold text-white cursor-pointer">Buy Top-Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Live 9:16 Vertical Preview Phone & Earn Now Claim -->
+    <aside class="lg:col-span-4 bg-[#171a21] border border-[#262b36] rounded-2xl p-4 flex flex-col items-center gap-3.5 h-fit">
+      <div class="w-full flex items-center justify-between">
+        <span class="text-xs font-black text-white">9:16 Optimized Clip Preview</span>
+        <span id="cfViralScore" class="font-mono-num text-xs font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">95/100 Viral Score</span>
+      </div>
+
+      <!-- Vertical 9:16 Phone Mockup -->
+      <div class="w-[235px] h-[405px] rounded-[28px] bg-gradient-to-b from-[#1a1029] via-[#0e121b] to-[#1a0b10] border-4 border-[#2f3646] shadow-2xl relative overflow-hidden flex flex-col justify-between p-4">
+        <div class="flex items-center justify-between text-[10px] font-black text-white/80">
+          <span class="bg-[#e41827] px-2 py-0.5 rounded-full">PLUGBET × CINEFLOW</span>
+          <span class="bg-black/50 px-2 py-0.5 rounded-full">9:16 HD</span>
+        </div>
+
+        <div class="my-auto text-center flex flex-col items-center gap-3">
+          <div class="w-16 h-16 rounded-full bg-indigo-500/25 border-2 border-indigo-400 flex items-center justify-center text-3xl animate-pulse">🎬</div>
+          <div id="cfPreviewHook" class="bg-black/75 border border-[#ffd000]/60 rounded-xl px-3 py-2 text-xs font-black text-[#ffd000] leading-snug shadow-lg">
+            "WAIT FOR THE 14.8X CASHOUT! 🚀🇳🇬"
+          </div>
+          <div id="cfPreviewCaption" class="text-[11px] font-bold text-white/90 bg-black/50 px-2.5 py-1.5 rounded-lg leading-relaxed">
+            Auto-captions & 9:16 reframing ready. Click Generate to produce your viral clip!
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[10px] font-bold text-gray-300 border-t border-white/10 pt-2">
+          <span>🎵 Trending Audio</span>
+          <span>❤️ 24.8K</span>
+        </div>
+      </div>
+
+      <!-- Publish & Earn Now CTA -->
+      <div class="w-full bg-[#0e1015] border border-[#28a909]/40 rounded-xl p-3 flex flex-col gap-2">
+        <div class="flex justify-between text-xs font-bold">
+          <span class="text-gray-300">Clip Publish Bounty:</span>
+          <span class="font-mono-num font-black text-[#34e815]">+NGN 2,500.00</span>
+        </div>
+        <button id="cfPublishBtn" onclick="publishAndEarnCineFlow()" class="w-full py-3 rounded-xl btn-bet-green font-black text-xs text-white cursor-pointer">
+          🚀 PUBLISH TO TIKTOK / REELS & EARN ₦2,500
+        </button>
+      </div>
+    </aside>
+  </section>
+
+  <!-- NGN CASHIER MODAL (DEPOSIT & NIGERIAN BANK WITHDRAWAL) -->
+  <div id="cashierModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-[#181c24] border border-[#2d3444] rounded-2xl max-w-md w-full p-5 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-[#262b36] pb-3">
+        <div class="flex items-center gap-2">
+          <span class="bg-[#e41827] text-white text-xs font-black px-2 py-0.5 rounded">PLUGBET</span>
+          <h3 class="font-black text-base">NGN Instant Cashier</h3>
+        </div>
+        <button onclick="closeModals()" class="text-gray-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+      </div>
+
+      <!-- Deposit / Withdraw Tabs -->
+      <div class="grid grid-cols-2 bg-[#0e1015] p-1 rounded-xl border border-[#262b36] text-xs font-extrabold">
+        <button id="cashierTabDep" onclick="switchCashierTab('deposit')" class="py-2 rounded-lg bg-[#28a909] text-white transition cursor-pointer">Deposit NGN</button>
+        <button id="cashierTabWdr" onclick="switchCashierTab('withdraw')" class="py-2 rounded-lg text-gray-400 hover:text-white transition cursor-pointer">Withdraw to Bank</button>
+      </div>
+
+      <!-- Deposit Panel -->
+      <div id="cashierDepositBody" class="flex flex-col gap-3">
+        <div class="flex flex-wrap gap-1.5 text-[11px] font-bold text-gray-300">
+          <span class="bg-[#0e1015] border border-[#2c3240] px-2.5 py-1 rounded-lg">💳 Verve / Mastercard</span>
+          <span class="bg-[#0e1015] border border-[#2c3240] px-2.5 py-1 rounded-lg">🏦 NIP Bank Transfer</span>
+          <span class="bg-[#0e1015] border border-[#2c3240] px-2.5 py-1 rounded-lg">📱 *737# / *901# USSD</span>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-400 block mb-1">Top-Up Amount (NGN)</label>
+          <input id="depositAmountInput" type="number" value="10000" min="100" step="500" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3.5 py-2.5 font-mono-num font-black text-white focus:outline-none focus:border-[#28a909]" />
+        </div>
+        <div class="grid grid-cols-4 gap-1.5 text-xs font-mono-num font-bold">
+          <button onclick="document.getElementById('depositAmountInput').value=2000" class="bg-[#222733] hover:bg-[#2e3545] py-1.5 rounded-lg cursor-pointer">₦2,000</button>
+          <button onclick="document.getElementById('depositAmountInput').value=5000" class="bg-[#222733] hover:bg-[#2e3545] py-1.5 rounded-lg cursor-pointer">₦5,000</button>
+          <button onclick="document.getElementById('depositAmountInput').value=10000" class="bg-[#222733] hover:bg-[#2e3545] py-1.5 rounded-lg cursor-pointer">₦10,000</button>
+          <button onclick="document.getElementById('depositAmountInput').value=50000" class="bg-[#222733] hover:bg-[#2e3545] py-1.5 rounded-lg cursor-pointer">₦50,000</button>
+        </div>
+        <button onclick="processDeposit()" class="w-full py-3 rounded-xl btn-bet-green font-black text-sm text-white cursor-pointer mt-1">
+          Credit NGN Wallet Instantly
+        </button>
+      </div>
+
+      <!-- Withdraw Panel -->
+      <div id="cashierWithdrawBody" class="hidden flex-col gap-3">
+        <div>
+          <label class="text-xs font-bold text-gray-400 block mb-1">Select Nigerian Bank</label>
+          <select id="withdrawBankSelect" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3 py-2.5 text-xs font-bold text-white focus:outline-none">
+            <option value="OPay Digital Services">OPay</option>
+            <option value="PalmPay">PalmPay</option>
+            <option value="GTBank (Guaranty Trust Bank)">GTBank</option>
+            <option value="Access Bank">Access Bank</option>
+            <option value="Zenith Bank">Zenith Bank</option>
+            <option value="UBA (United Bank for Africa)">UBA</option>
+            <option value="Kuda Microfinance Bank">Kuda Bank</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-400 block mb-1">10-Digit NUBAN Account Number</label>
+          <input id="withdrawAccountInput" type="text" maxlength="10" placeholder="0123456789" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3.5 py-2.5 font-mono-num font-bold text-white focus:outline-none" />
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-400 block mb-1">Withdrawal Amount (Min ₦1,000)</label>
+          <input id="withdrawAmountInput" type="number" value="5000" min="1000" step="500" class="w-full bg-[#0e1015] border border-[#2c3240] rounded-xl px-3.5 py-2.5 font-mono-num font-black text-white focus:outline-none" />
+        </div>
+        <button onclick="processWithdrawal()" class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 font-black text-sm text-white cursor-pointer mt-1">
+          Send Instant NIP Payout
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Login Modal -->
-  <div class="modal-backdrop" id="loginModal">
-    <div class="modal">
-      <div class="modal-head"><span>Sign In to PLUGBET Aviator</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
-      <input type="text" id="loginUser" placeholder="Username" />
-      <input type="password" id="loginPass" placeholder="Password" />
-      <button class="modal-submit" onclick="loginUser()">Login</button>
-    </div>
-  </div>
+  <!-- PROVABLY FAIR SHA-256 AUDIT MODAL -->
+  <div id="fairModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-[#181c24] border border-[#2d3444] rounded-2xl max-w-lg w-full p-5 shadow-2xl flex flex-col gap-3.5">
+      <div class="flex items-center justify-between border-b border-[#262b36] pb-3">
+        <div class="flex items-center gap-2">
+          <span>🛡️</span>
+          <h3 class="font-black text-base">Provably Fair SHA-256 Round Audit</h3>
+        </div>
+        <button onclick="closeModals()" class="text-gray-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+      </div>
 
-  <!-- Provably Fair Modal -->
-  <div class="modal-backdrop" id="fairModal">
-    <div class="modal">
-      <div class="modal-head"><span>🛡️ Provably Fair SHA-256 Audit</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
-      <p style="font-size:12px; color:#9ca3af; line-height:1.5;">
-        Every PLUGBET Aviator flight generates a cryptographic server seed before takeoff. The SHA-256 hash is locked prior to flight and the raw seed is revealed once the plane flies away.
+      <p class="text-xs text-gray-300 leading-relaxed">
+        Every PLUGBET Aviator flight outcome is deterministically derived before takeoff from a cryptographic Server Seed combined with the first 3 player Client Seeds using <code class="text-emerald-400 font-mono">SHA-256</code>.
       </p>
-      <div style="font-size:12px; font-weight:700;">Round ID: <span id="fairRoundId" style="color:#ffd000;">—</span></div>
-      <div style="font-size:11px; color:#9ca3af;">Pre-Flight SHA-256 Hash:</div>
-      <div class="hash-box" id="fairRoundHash">Place a bet to inspect live round hash.</div>
-      <div style="font-size:11px; color:#9ca3af;">Revealed Server Seed (Post-Crash):</div>
-      <div class="hash-box" id="fairServerSeed" style="color:#38bdf8;">Hidden until flight completes.</div>
-      <button class="modal-submit" onclick="closeModals()">Close</button>
-    </div>
-  </div>
 
-  <!-- Cashier Modal (Paystack Deposit + Bank Withdraw) -->
-  <div class="modal-backdrop" id="cashierModal">
-    <div class="modal">
-      <div class="modal-head"><span>PLUGBET NGN Cashier</span><span style="cursor:pointer;" onclick="closeModals()">✕</span></div>
-      <div class="cashier-tabs">
-        <button class="cashier-tab active" id="tabDeposit" onclick="switchCashierTab('deposit')">Deposit (Paystack)</button>
-        <button class="cashier-tab" id="tabWithdraw" onclick="switchCashierTab('withdraw')">Withdraw (Bank)</button>
+      <div class="bg-[#0e1015] border border-[#262b36] rounded-xl p-3 flex flex-col gap-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-gray-400 font-bold">Active Round ID:</span>
+          <span id="fairRoundIdText" class="font-mono-num font-extrabold text-[#ffd000]">#84920</span>
+        </div>
+        <div>
+          <span class="text-gray-400 font-bold block mb-1">Server Seed SHA-256 Commitment:</span>
+          <div id="fairHashText" class="font-mono-num text-[11px] text-emerald-400 break-all bg-black/40 p-2 rounded border border-white/5">
+            e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+          </div>
+        </div>
+        <div>
+          <span class="text-gray-400 font-bold block mb-1">Previous Revealed Server Seed & Crash Point:</span>
+          <div id="fairPrevSeedText" class="font-mono-num text-[11px] text-gray-300 break-all bg-black/40 p-2 rounded border border-white/5">
+            Waiting for first completed flight...
+          </div>
+        </div>
       </div>
-      <div id="depositPanel" style="display:flex; flex-direction:column; gap:12px;">
-        <input type="number" id="depositAmount" value="5000" min="100" placeholder="Deposit Amount (NGN)" />
-        <input type="email" id="depositEmail" placeholder="Receipt Email (e.g. chinedu@gmail.com)" />
-        <button class="modal-submit" id="depositSubmitBtn" onclick="submitDeposit()">Pay with Paystack</button>
-      </div>
-      <div id="withdrawPanel" style="display:none; flex-direction:column; gap:12px;">
-        <select id="bankName">
-          <option value="OPay Digital Services">OPay</option>
-          <option value="PalmPay">PalmPay</option>
-          <option value="GTBank">GTBank</option>
-          <option value="Access Bank">Access Bank</option>
-          <option value="Zenith Bank">Zenith Bank</option>
-          <option value="UBA">UBA</option>
-          <option value="Kuda Bank">Kuda Bank</option>
-        </select>
-        <input type="text" id="accountNumber" maxlength="10" placeholder="10-Digit NUBAN Account Number" />
-        <input type="text" id="accountName" placeholder="Account Holder Name" />
-        <input type="number" id="withdrawAmount" value="5000" min="1000" placeholder="Withdraw Amount (Min ₦1,000)" />
-        <button class="modal-submit" style="background:#d97706;" onclick="submitWithdrawal()">Request Instant Payout</button>
-      </div>
+
+      <button onclick="closeModals()" class="w-full py-2.5 rounded-xl bg-[#262b36] hover:bg-[#323947] font-extrabold text-xs text-white cursor-pointer">
+        Close Verification Window
+      </button>
     </div>
   </div>
 
   <script>
-    let token = localStorage.getItem('casino_token') || '';
-    let username = localStorage.getItem('casino_user') || '';
-    let sfxEnabled = true;
-
-    // Flight State Machine: 'WAITING' | 'FLYING' | 'CRASHED'
-    let gameState = 'WAITING';
+    // =========================================================================
+    // 1. CORE STATE & CURRENCY FORMATTING
+    // =========================================================================
+    let balanceNGN = 50000.00;
+    let roundNumber = 84920;
+    let gameState = 'WAITING'; // 'WAITING' | 'FLYING' | 'CRASHED'
     let currentMultiplier = 1.00;
-    let flightStartPerf = 0;
-    let simulatedCrashPoint = 2.50;
-    let activeRoundId = null;
-    let pollTimer = null;
-    let boardingTimer = null;
-    let sunAngle = 0;
+    let targetCrashPoint = 2.45;
+    let flightStartTime = 0;
+    let waitingTimeLeft = 5.0;
+    const WAITING_DURATION = 5.0;
 
-    // Panel States: 'IDLE' | 'QUEUED' | 'PLACED' | 'ACTIVE'
+    // Provably Fair Cryptographic State
+    let currentServerSeed = '';
+    let currentRoundHash = '';
+    let lastRevealedInfo = 'Round #84919 • Seed: 9f84c2a17b0e... • Crashed @ 3.42x';
+
+    // Round History Array
+    let roundHistory = [3.42, 1.18, 12.65, 1.84, 2.15, 1.04, 6.90, 2.77, 1.52, 18.40, 1.31, 4.12, 1.95, 2.08];
+
+    // Dual Independent Bet Panels State
+    // state: 'IDLE' | 'QUEUED' | 'ACTIVE'
     const panels = {
-      1: { state: 'IDLE', amount: 500, cashingOut: false },
-      2: { state: 'IDLE', amount: 1000, cashingOut: false }
+      1: {
+        state: 'IDLE',
+        stake: 500,
+        autoBet: false,
+        autoCashEnabled: false,
+        autoCashTarget: 2.00
+      },
+      2: {
+        state: 'IDLE',
+        stake: 1000,
+        autoBet: false,
+        autoCashEnabled: false,
+        autoCashTarget: 2.50
+      }
     };
 
-    const myBetsHistory = [];
+    // Feed Data
     let currentFeedTab = 'all';
+    let myBetsHistory = [];
+    let topWinsHistory = [
+      { name: 'Chinedu', surname: 'Okafor', phone: '0803****819', bet: 5000, mult: 24.50, win: 122500 },
+      { name: 'Ngozi', surname: 'Eze', phone: '0902****673', bet: 10000, mult: 14.20, win: 142000 },
+      { name: 'Tunde', surname: 'Adeyemi', phone: '0706****915', bet: 2500, mult: 38.10, win: 95250 },
+      { name: 'Amina', surname: 'Bello', phone: '0814****402', bet: 5000, mult: 11.80, win: 59000 },
+      { name: 'Ibrahim', surname: 'Musa', phone: '0809****128', bet: 4000, mult: 19.40, win: 77600 }
+    ];
+    let liveRoundBets = [];
 
-    // Web Audio Synthesizer
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    const NIGERIAN_PLAYERS = [
+      { first: 'Chinedu', last: 'Okafor', phone: '0803****819' },
+      { first: 'Amina', last: 'Bello', phone: '0814****402' },
+      { first: 'Tunde', last: 'Adeyemi', phone: '0706****915' },
+      { first: 'Ngozi', last: 'Eze', phone: '0902****673' },
+      { first: 'Ibrahim', last: 'Musa', phone: '0809****128' },
+      { first: 'Funke', last: 'Balogun', phone: '0905****894' },
+      { first: 'Emeka', last: 'Nwosu', phone: '0813****210' },
+      { first: 'Zainab', last: 'Suleiman', phone: '0816****330' },
+      { first: 'Segun', last: 'Ogunleye', phone: '0703****554' },
+      { first: 'Chiamaka', last: 'Udeh', phone: '0806****741' },
+      { first: 'Yusuf', last: 'Abdullahi', phone: '0810****908' },
+      { first: 'Bolanle', last: 'Fashola', phone: '0901****612' },
+      { first: 'Obinna', last: 'Ibe', phone: '0805****389' },
+      { first: 'Halima', last: 'Danladi', phone: '0818****447' }
+    ];
+
+    function formatNGN(amount) {
+      return Number(amount || 0).toLocaleString('en-NG', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function updateBalanceUI() {
+      document.getElementById('headerBalance').textContent = formatNGN(balanceNGN);
+    }
+
+    // =========================================================================
+    // 2. SYNTHESIZED WEB AUDIO ENGINE (ZERO EXTERNAL AUDIO FILES)
+    // =========================================================================
+    let soundEnabled = true;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
-    function playBeep(freq, dur, type = 'sine', vol = 0.06) {
-      if (!sfxEnabled) return;
-      if (!audioCtx) audioCtx = new AudioCtx();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type; osc.frequency.value = freq;
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + dur);
-    }
-    function toggleSfx() {
-      sfxEnabled = !sfxEnabled;
-      document.getElementById('sfxToggleBtn').textContent = sfxEnabled ? '🔊 SFX' : '🔇 Muted';
-    }
 
-    function fmtNGN(val) {
-      return Number(val || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    // Panel Controls
-    function setPanelMode(p, mode) {
-      document.getElementById(`p${p}-mode-bet`).classList.toggle('active', mode === 'bet');
-      document.getElementById(`p${p}-mode-auto`).classList.toggle('active', mode === 'auto');
-      document.getElementById(`p${p}-autobar`).classList.toggle('visible', mode === 'auto');
-    }
-
-    function stepStake(p, delta) {
-      if (panels[p].state !== 'IDLE') return;
-      const inp = document.getElementById(`p${p}-stake`);
-      const next = Math.max(50, Math.min(500000, (parseFloat(inp.value) || 500) + delta));
-      inp.value = next;
-      syncStakeLabel(p);
-    }
-
-    function setStake(p, val) {
-      if (panels[p].state !== 'IDLE') return;
-      document.getElementById(`p${p}-stake`).value = val;
-      syncStakeLabel(p);
-    }
-
-    function syncStakeLabel(p) {
-      const val = Math.max(50, parseFloat(document.getElementById(`p${p}-stake`).value) || 50);
-      panels[p].amount = val;
-      renderPanelButton(p);
-    }
-
-    function renderPanelButton(p) {
-      const st = panels[p].state;
-      const amt = panels[p].amount;
-      const btn = document.getElementById(`p${p}-btn`);
-      const lbl = document.getElementById(`p${p}-btn-label`);
-      const sub = document.getElementById(`p${p}-btn-sub`);
-
-      btn.className = 'action-btn';
-      if (st === 'IDLE') {
-        btn.classList.add('state-bet');
-        lbl.textContent = 'BET';
-        sub.textContent = `NGN ${fmtNGN(amt)}`;
-      } else if (st === 'QUEUED') {
-        btn.classList.add('state-cancel');
-        lbl.textContent = 'CANCEL';
-        sub.textContent = 'Waiting for next round';
-      } else if (st === 'PLACED') {
-        btn.classList.add('state-cancel');
-        lbl.textContent = 'CANCEL';
-        sub.textContent = `NGN ${fmtNGN(amt)}`;
-      } else if (st === 'ACTIVE') {
-        btn.classList.add('state-cashout');
-        lbl.textContent = 'CASH OUT';
-        sub.textContent = `NGN ${fmtNGN(amt * currentMultiplier)}`;
+    function initAudio() {
+      if (!audioCtx && AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
     }
 
-    async function handlePanelAction(p) {
-      if (!token) return openModal('loginModal');
-      const st = panels[p].state;
-
-      if (st === 'IDLE') {
-        const amt = Math.max(50, parseFloat(document.getElementById(`p${p}-stake`).value) || 50);
-        panels[p].amount = amt;
-        if (gameState === 'WAITING') {
-          await submitBetToServer(p, amt);
-        } else {
-          panels[p].state = 'QUEUED';
-          renderPanelButton(p);
-        }
-      } else if (st === 'QUEUED') {
-        panels[p].state = 'IDLE';
-        renderPanelButton(p);
-      } else if (st === 'PLACED') {
-        await cancelBetOnServer(p);
-      } else if (st === 'ACTIVE') {
-        await cashoutOnServer(p, null);
-      }
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sfxIcon').textContent = soundEnabled ? '🔊' : '🔇';
+      showToast(soundEnabled ? 'Sound effects enabled' : 'Sound effects muted', 'info');
     }
 
-    async function submitBetToServer(p, amount) {
-      const res = await fetch('/api/aviator/bet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ panel: p, amount, roundId: activeRoundId })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        panels[p].state = 'IDLE';
-        renderPanelButton(p);
-        alert(data.error || 'Could not place bet');
-        return;
-      }
+    function playTakeoffSfx() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.exponentialRampToValueAtTime(340, now + 0.55);
 
-      activeRoundId = data.roundId;
-      panels[p].state = 'PLACED';
-      panels[p].amount = amount;
-      document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-      document.getElementById('fairRoundId').textContent = data.roundId;
-      document.getElementById('fairRoundHash').textContent = data.roundHash;
-      document.getElementById('fairServerSeed').textContent = 'Locked until flight crashes...';
-      playBeep(580, 0.08, 'triangle');
-      renderPanelButton(p);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } catch (e) {}
     }
 
-    async function cancelBetOnServer(p) {
-      if (!activeRoundId) {
-        panels[p].state = 'IDLE';
-        renderPanelButton(p);
-        return;
-      }
-      const res = await fetch('/api/aviator/cancel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ roundId: activeRoundId, panel: p })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        panels[p].state = 'IDLE';
-        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-        if (panels[1].state === 'IDLE' && panels[2].state === 'IDLE') activeRoundId = null;
-        renderPanelButton(p);
-      }
-    }
-
-    async function cashoutOnServer(p, targetMult) {
-      if (panels[p].state !== 'ACTIVE' || panels[p].cashingOut || !activeRoundId) return;
-      panels[p].cashingOut = true;
-
-      const res = await fetch('/api/aviator/cashout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ roundId: activeRoundId, panel: p, multiplier: targetMult })
-      });
-      const data = await res.json();
-      panels[p].cashingOut = false;
-
-      if (res.ok) {
-        panels[p].state = 'IDLE';
-        renderPanelButton(p);
-        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-        playBeep(880, 0.22, 'triangle', 0.1);
-        showWinToast(`Panel ${p} Cashed Out @ ${data.multiplier.toFixed(2)}x — +NGN ${fmtNGN(data.payout)}!`);
-        myBetsHistory.unshift({
-          name: `${username} (P${p})`,
-          stake: panels[p].amount,
-          mult: data.multiplier,
-          payout: data.payout
+    function playCashoutSfx(isBigWin = false) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const notes = isBigWin ? [587.33, 739.99, 880, 1174.66, 1479.98] : [587.33, 880, 1174.66];
+        notes.forEach((freq, i) => {
+          const now = audioCtx.currentTime + i * 0.065;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
         });
-        renderSidebarFeed();
-      } else if (data.crashed) {
-        triggerCrashState(data.crashPoint, data.serverSeed, data.roundHash);
+      } catch (e) {}
+    }
+
+    function playFlyAwaySfx() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(95, now + 0.45);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.48);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch (e) {}
+    }
+
+    function playClickSfx() {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(640, now);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.055);
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 3. PROVABLY FAIR SEED & CRASH POINT GENERATOR
+    // =========================================================================
+    async function sha256Hex(str) {
+      try {
+        if (window.crypto && window.crypto.subtle) {
+          const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+          return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+      } catch (e) {}
+      // Deterministic fallback hash if SubtleCrypto is unavailable in iframe
+      let hash = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        hash ^= str.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
       }
+      return (hash >>> 0).toString(16).padStart(8, '0').repeat(8);
     }
 
-    function showWinToast(msg) {
-      const el = document.getElementById('winToast');
-      el.textContent = `🏆 ${msg}`;
-      el.style.display = 'flex';
-      setTimeout(() => { el.style.display = 'none'; }, 3500);
-    }
+    async function prepareNextRoundSeed() {
+      const randomBytes = new Uint8Array(16);
+      crypto.getRandomValues(randomBytes);
+      currentServerSeed = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+      currentRoundHash = await sha256Hex(currentServerSeed);
 
-    // Round Lifecycle: Boarding (5s) -> Takeoff -> Flying -> Crash (3s)
-    async function startBoardingPhase() {
-      gameState = 'WAITING';
-      currentMultiplier = 1.00;
-      activeRoundId = null;
-      clearInterval(pollTimer);
-
-      document.getElementById('flewBanner').style.display = 'none';
-      document.getElementById('centerMult').style.display = 'none';
-      document.getElementById('centerMult').classList.remove('crashed');
-      document.getElementById('boardingBox').style.display = 'flex';
-
-      // Process Queued or Auto-Bets for Panel 1 & Panel 2
-      for (const p of [1, 2]) {
-        const autoOn = document.getElementById(`p${p}-autobet`).checked;
-        if (token && (panels[p].state === 'QUEUED' || (panels[p].state === 'IDLE' && autoOn))) {
-          const amt = Math.max(50, parseFloat(document.getElementById(`p${p}-stake`).value) || 50);
-          await submitBetToServer(p, amt);
-        } else {
-          renderPanelButton(p);
-        }
-      }
-
-      const duration = 5000;
-      const start = performance.now();
-      clearInterval(boardingTimer);
-      boardingTimer = setInterval(() => {
-        const elapsed = performance.now() - start;
-        const pct = Math.max(0, 100 - (elapsed / duration) * 100);
-        document.getElementById('boardingFill').style.width = `${pct}%`;
-        if (elapsed >= duration) {
-          clearInterval(boardingTimer);
-          beginTakeoff();
-        }
-      }, 50);
-    }
-
-    async function beginTakeoff() {
-      gameState = 'FLYING';
-      currentMultiplier = 1.00;
-      flightStartPerf = performance.now();
-
-      document.getElementById('boardingBox').style.display = 'none';
-      document.getElementById('centerMult').style.display = 'block';
-      document.getElementById('centerMult').textContent = '1.00x';
-      playBeep(320, 0.25, 'sawtooth', 0.05);
-
-      [1, 2].forEach(p => {
-        if (panels[p].state === 'PLACED') {
-          panels[p].state = 'ACTIVE';
-          renderPanelButton(p);
-        }
-      });
-
-      if (token && activeRoundId) {
-        await fetch('/api/aviator/takeoff', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ roundId: activeRoundId })
-        });
-
-        // Poll MongoDB round state every 250ms
-        pollTimer = setInterval(async () => {
-          if (gameState !== 'FLYING' || !activeRoundId) return;
-          try {
-            const res = await fetch(`/api/aviator/poll/${activeRoundId}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (data.crashed) {
-              triggerCrashState(data.crashPoint, data.serverSeed, data.roundHash);
-            }
-          } catch (e) {}
-        }, 250);
+      // Standard Crash house-edge distribution (97% RTP, 3% instant 1.00x edge)
+      const h = parseInt(currentRoundHash.slice(0, 13), 16);
+      const e = Math.pow(2, 52);
+      if (h % 33 === 0) {
+        targetCrashPoint = 1.00;
       } else {
-        // Guest Spectator Mode visual crash target
-        simulatedCrashPoint = Math.random() < 0.12 ? 1.05 : parseFloat((1.25 + Math.random() * 6.5).toFixed(2));
+        const raw = (100 * e - h) / (e - h);
+        targetCrashPoint = Math.max(1.01, Math.min(250.00, Math.floor(raw) / 100));
+      }
+
+      document.getElementById('roundNumberBadge').textContent = roundNumber;
+      document.getElementById('fairRoundIdText').textContent = `#${roundNumber}`;
+      document.getElementById('fairHashText').textContent = currentRoundHash;
+      document.getElementById('fairPrevSeedText').textContent = lastRevealedInfo;
+    }
+
+    // =========================================================================
+    // 4. TOAST NOTIFICATIONS & HISTORY RIBBON
+    // =========================================================================
+    function showToast(message, type = 'win') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        win: 'bg-[#122b14]/95 border-[#28a909] text-white shadow-[0_10px_30px_rgba(40,169,9,0.4)]',
+        error: 'bg-[#2b1216]/95 border-[#e41827] text-red-200 shadow-[0_10px_30px_rgba(228,24,39,0.4)]',
+        info: 'bg-[#181d27]/95 border-[#38bdf8] text-sky-200 shadow-[0_10px_30px_rgba(56,189,248,0.3)]'
+      };
+      toast.className = `toast-banner px-4 py-3 rounded-2xl border backdrop-blur-md flex items-center justify-between gap-3 text-xs sm:text-sm font-extrabold ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <div class="flex items-center gap-2.5">
+          <span class="text-base">${type === 'win' ? '🏆' : type === 'error' ? '⚠️' : '✈️'}</span>
+          <span>${message}</span>
+        </div>
+        <span class="text-[10px] uppercase tracking-wider opacity-70">PLUGBET</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, -12px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+      }, 3400);
+    }
+
+    function renderHistoryRibbon() {
+      const ribbon = document.getElementById('historyRibbon');
+      ribbon.innerHTML = roundHistory.map(val => {
+        const cls = val >= 10 ? 'pill-pink' : val >= 2 ? 'pill-purple' : 'pill-blue';
+        return `<span class="font-mono-num text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shrink-0 ${cls}">${val.toFixed(2)}x</span>`;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 5. DUAL BET PANEL INTERACTIONS
+    // =========================================================================
+    function setPanelMode(panelId, mode) {
+      playClickSfx();
+      const isAuto = mode === 'auto';
+      document.getElementById(`p${panelId}TabBet`).className = isAuto
+        ? 'py-1 rounded-full text-gray-400 hover:text-white transition cursor-pointer'
+        : 'py-1 rounded-full bg-[#262b36] text-white transition cursor-pointer';
+      document.getElementById(`p${panelId}TabAuto`).className = isAuto
+        ? 'py-1 rounded-full bg-[#262b36] text-white transition cursor-pointer'
+        : 'py-1 rounded-full text-gray-400 hover:text-white transition cursor-pointer';
+
+      const autoRow = document.getElementById(`p${panelId}AutoRow`);
+      if (isAuto) {
+        autoRow.classList.remove('hidden');
+      } else {
+        autoRow.classList.add('hidden');
       }
     }
 
-    function triggerCrashState(crashPoint, serverSeed, roundHash) {
-      if (gameState === 'CRASHED') return;
-      gameState = 'CRASHED';
-      clearInterval(pollTimer);
-      currentMultiplier = crashPoint;
+    function adjustStake(panelId, delta) {
+      if (panels[panelId].state !== 'IDLE') return;
+      playClickSfx();
+      const input = document.getElementById(`p${panelId}StakeInput`);
+      let nextVal = Math.max(50, Math.min(500000, (parseFloat(input.value) || 0) + delta));
+      input.value = nextVal;
+      panels[panelId].stake = nextVal;
+      updatePanelButtons();
+    }
 
-      const multEl = document.getElementById('centerMult');
-      multEl.textContent = `${crashPoint.toFixed(2)}x`;
-      multEl.classList.add('crashed');
-      document.getElementById('flewBanner').style.display = 'block';
-      playBeep(140, 0.35, 'sawtooth', 0.09);
+    function setStake(panelId, amount) {
+      if (panels[panelId].state !== 'IDLE') return;
+      playClickSfx();
+      const input = document.getElementById(`p${panelId}StakeInput`);
+      input.value = amount;
+      panels[panelId].stake = amount;
+      updatePanelButtons();
+    }
 
-      if (serverSeed) {
-        document.getElementById('fairServerSeed').textContent = serverSeed;
-        document.getElementById('fairRoundHash').textContent = roundHash;
+    function sanitizeStake(panelId) {
+      const input = document.getElementById(`p${panelId}StakeInput`);
+      let val = parseFloat(input.value);
+      if (isNaN(val) || val < 50) val = 50;
+      if (val > 500000) val = 500000;
+      input.value = val;
+      panels[panelId].stake = val;
+      updatePanelButtons();
+    }
+
+    function toggleAutoBet(panelId) {
+      playClickSfx();
+      panels[panelId].autoBet = !panels[panelId].autoBet;
+      document.getElementById(`p${panelId}AutoBetToggle`).classList.toggle('active', panels[panelId].autoBet);
+      if (panels[panelId].autoBet && panels[panelId].state === 'IDLE') {
+        handlePanelAction(panelId);
+      }
+    }
+
+    function toggleAutoCash(panelId) {
+      playClickSfx();
+      panels[panelId].autoCashEnabled = !panels[panelId].autoCashEnabled;
+      document.getElementById(`p${panelId}AutoCashToggle`).classList.toggle('active', panels[panelId].autoCashEnabled);
+    }
+
+    function handlePanelAction(panelId) {
+      const p = panels[panelId];
+      sanitizeStake(panelId);
+
+      // 1. IDLE -> Place bet immediately (if WAITING) or Queue for next round (if FLYING/CRASHED)
+      if (p.state === 'IDLE') {
+        if (p.stake > balanceNGN) {
+          showToast('Insufficient NGN balance. Top up via Cashier!', 'error');
+          openCashier('deposit');
+          return;
+        }
+        balanceNGN = parseFloat((balanceNGN - p.stake).toFixed(2));
+        updateBalanceUI();
+        playClickSfx();
+
+        if (gameState === 'WAITING') {
+          p.state = 'ACTIVE';
+          addPlayerBetToFeed(panelId, p.stake);
+        } else {
+          p.state = 'QUEUED';
+        }
+        updatePanelButtons();
+        return;
       }
 
-      // Reset any uncashed active bets to IDLE (lost)
-      [1, 2].forEach(p => {
-        if (panels[p].state === 'ACTIVE') {
-          myBetsHistory.unshift({ name: `${username} (P${p})`, stake: panels[p].amount, mult: 0, payout: 0 });
-          panels[p].state = 'IDLE';
-          renderPanelButton(p);
+      // 2. QUEUED -> Cancel queued bet and refund stake
+      if (p.state === 'QUEUED') {
+        balanceNGN = parseFloat((balanceNGN + p.stake).toFixed(2));
+        updateBalanceUI();
+        p.state = 'IDLE';
+        playClickSfx();
+        updatePanelButtons();
+        return;
+      }
+
+      // 3. ACTIVE -> If WAITING, cancel & refund; if FLYING, Cash Out!
+      if (p.state === 'ACTIVE') {
+        if (gameState === 'WAITING') {
+          balanceNGN = parseFloat((balanceNGN + p.stake).toFixed(2));
+          updateBalanceUI();
+          p.state = 'IDLE';
+          removePlayerBetFromFeed(panelId);
+          playClickSfx();
+          updatePanelButtons();
+        } else if (gameState === 'FLYING') {
+          cashOutPanel(panelId);
+        }
+      }
+    }
+
+    function cashOutPanel(panelId) {
+      const p = panels[panelId];
+      if (p.state !== 'ACTIVE' || gameState !== 'FLYING') return;
+
+      const cashedMultiplier = currentMultiplier;
+      const winAmount = parseFloat((p.stake * cashedMultiplier).toFixed(2));
+      balanceNGN = parseFloat((balanceNGN + winAmount).toFixed(2));
+      updateBalanceUI();
+
+      p.state = 'IDLE';
+      updatePanelButtons();
+
+      // Update Live Feed & My Bets
+      markPlayerCashoutInFeed(panelId, cashedMultiplier, winAmount);
+      myBetsHistory.unshift({
+        round: roundNumber,
+        bet: p.stake,
+        mult: cashedMultiplier,
+        win: winAmount,
+        status: 'WON'
+      });
+      if (cashedMultiplier >= 5) {
+        topWinsHistory.unshift({
+          name: 'You',
+          surname: '(NG)',
+          phone: 'VIP****NGN',
+          bet: p.stake,
+          mult: cashedMultiplier,
+          win: winAmount
+        });
+        spawnConfettiBurst();
+      }
+      if (currentFeedTab !== 'all') renderFeed();
+
+      playCashoutSfx(cashedMultiplier >= 5);
+      showToast(`You cashed out at ${cashedMultiplier.toFixed(2)}x! Won NGN ${formatNGN(winAmount)}`, 'win');
+    }
+
+    function updatePanelButtons() {
+      [1, 2].forEach(id => {
+        const p = panels[id];
+        const btn = document.getElementById(`p${id}ActionBtn`);
+        const title = document.getElementById(`p${id}BtnTitle`);
+        const sub = document.getElementById(`p${id}BtnSub`);
+        const tag = document.getElementById(`p${id}StatusTag`);
+        const input = document.getElementById(`p${id}StakeInput`);
+
+        input.disabled = p.state !== 'IDLE';
+
+        if (p.state === 'IDLE') {
+          btn.className = 'w-full rounded-2xl btn-bet-green text-white flex flex-col items-center justify-center p-2 cursor-pointer';
+          title.textContent = 'BET';
+          sub.textContent = `${formatNGN(p.stake)} NGN`;
+          tag.textContent = gameState === 'WAITING' ? 'READY' : 'NEXT ROUND';
+          tag.className = 'text-[11px] font-extrabold text-gray-400';
+        } else if (p.state === 'QUEUED') {
+          btn.className = 'w-full rounded-2xl btn-cancel-red text-white flex flex-col items-center justify-center p-2 cursor-pointer';
+          title.textContent = 'CANCEL';
+          sub.textContent = 'Waiting for next round';
+          tag.textContent = 'QUEUED';
+          tag.className = 'text-[11px] font-extrabold text-amber-400';
+        } else if (p.state === 'ACTIVE') {
+          if (gameState === 'WAITING') {
+            btn.className = 'w-full rounded-2xl btn-cancel-red text-white flex flex-col items-center justify-center p-2 cursor-pointer';
+            title.textContent = 'CANCEL';
+            sub.textContent = `${formatNGN(p.stake)} NGN`;
+            tag.textContent = 'BET PLACED';
+            tag.className = 'text-[11px] font-extrabold text-emerald-400';
+          } else if (gameState === 'FLYING') {
+            const liveWin = p.stake * currentMultiplier;
+            btn.className = 'w-full rounded-2xl btn-cashout-amber text-white flex flex-col items-center justify-center p-2 cursor-pointer';
+            title.textContent = 'CASH OUT';
+            sub.textContent = `${formatNGN(liveWin)} NGN`;
+            tag.textContent = 'IN FLIGHT';
+            tag.className = 'text-[11px] font-extrabold text-amber-400 animate-pulse';
+          }
         }
       });
-      renderSidebarFeed();
-
-      // Add pill to history ribbon
-      const pills = document.getElementById('historyPills');
-      const sp = document.createElement('span');
-      sp.className = `h-pill ${crashPoint >= 10 ? 'h-pink' : (crashPoint >= 2 ? 'h-purple' : 'h-blue')}`;
-      sp.textContent = `${crashPoint.toFixed(2)}x`;
-      pills.insertBefore(sp, pills.firstChild);
-      if (pills.children.length > 14) pills.removeChild(pills.lastChild);
-
-      setTimeout(startBoardingPhase, 3000);
     }
 
-    // 60fps Canvas Renderer
+    // =========================================================================
+    // 6. SIMULATED LIVE NIGERIAN PLAYERS FEED
+    // =========================================================================
+    function generateSimulatedRoundBets() {
+      liveRoundBets = [];
+      const shuffled = [...NIGERIAN_PLAYERS].sort(() => Math.random() - 0.5);
+      const count = 11;
+      const presetStakes = [100, 200, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+
+      for (let i = 0; i < count; i++) {
+        const player = shuffled[i % shuffled.length];
+        const stake = presetStakes[Math.floor(Math.random() * presetStakes.length)];
+        // Target cashout between 1.15x and 18.0x
+        const r = Math.random();
+        const plannedCashout = r < 0.55
+          ? parseFloat((1.15 + Math.random() * 1.4).toFixed(2))
+          : r < 0.88
+            ? parseFloat((2.5 + Math.random() * 4.5).toFixed(2))
+            : parseFloat((7.0 + Math.random() * 14.0).toFixed(2));
+
+        liveRoundBets.push({
+          id: `sim_${i}`,
+          isUser: false,
+          first: player.first,
+          last: player.last,
+          phone: player.phone,
+          bet: stake,
+          plannedCashout,
+          cashedOut: false,
+          cashoutMult: 0,
+          payout: 0
+        });
+      }
+
+      // Activate any queued player panels into this round
+      [1, 2].forEach(panelId => {
+        const p = panels[panelId];
+        if (p.state === 'QUEUED') {
+          p.state = 'ACTIVE';
+          addPlayerBetToFeed(panelId, p.stake);
+        } else if (p.state === 'IDLE' && p.autoBet) {
+          if (p.stake <= balanceNGN) {
+            balanceNGN = parseFloat((balanceNGN - p.stake).toFixed(2));
+            updateBalanceUI();
+            p.state = 'ACTIVE';
+            addPlayerBetToFeed(panelId, p.stake);
+          } else {
+            p.autoBet = false;
+            document.getElementById(`p${panelId}AutoBetToggle`).classList.remove('active');
+            showToast(`Auto-Bet paused on Panel ${panelId}: Insufficient NGN`, 'error');
+          }
+        }
+      });
+
+      document.getElementById('liveBetsCount').textContent = (210 + Math.floor(Math.random() * 85)).toString();
+      renderFeed();
+    }
+
+    function addPlayerBetToFeed(panelId, stake) {
+      liveRoundBets.unshift({
+        id: `user_p${panelId}`,
+        isUser: true,
+        first: 'You',
+        last: `(Panel ${panelId})`,
+        phone: '0803****VIP',
+        bet: stake,
+        plannedCashout: Infinity,
+        cashedOut: false,
+        cashoutMult: 0,
+        payout: 0
+      });
+      renderFeed();
+    }
+
+    function removePlayerBetFromFeed(panelId) {
+      liveRoundBets = liveRoundBets.filter(b => b.id !== `user_p${panelId}`);
+      renderFeed();
+    }
+
+    function markPlayerCashoutInFeed(panelId, mult, payout) {
+      const item = liveRoundBets.find(b => b.id === `user_p${panelId}`);
+      if (item) {
+        item.cashedOut = true;
+        item.cashoutMult = mult;
+        item.payout = payout;
+      }
+      renderFeed();
+    }
+
+    function switchFeedTab(tab) {
+      playClickSfx();
+      currentFeedTab = tab;
+      document.getElementById('feedTabAll').className = tab === 'all' ? 'py-1.5 rounded-lg bg-[#262b36] text-white transition cursor-pointer' : 'py-1.5 rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+      document.getElementById('feedTabMy').className = tab === 'my' ? 'py-1.5 rounded-lg bg-[#262b36] text-white transition cursor-pointer' : 'py-1.5 rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+      document.getElementById('feedTabTop').className = tab === 'top' ? 'py-1.5 rounded-lg bg-[#262b36] text-white transition cursor-pointer' : 'py-1.5 rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+      renderFeed();
+    }
+
+    function renderFeed() {
+      const listEl = document.getElementById('betsFeedList');
+      let totalPayout = 0;
+
+      if (currentFeedTab === 'all') {
+        liveRoundBets.forEach(b => { if (b.cashedOut) totalPayout += b.payout; });
+        document.getElementById('liveTotalPayout').textContent = `NGN ${formatNGN(totalPayout)}`;
+
+        listEl.innerHTML = liveRoundBets.map(b => {
+          const rowBg = b.cashedOut
+            ? 'bg-[#122b16]/90 border border-[#28a909]/45'
+            : b.isUser
+              ? 'bg-[#1f2636] border border-sky-500/40'
+              : 'bg-[#12151c]/75 border border-transparent';
+
+          const nameHtml = b.isUser
+            ? `<span class="text-[#ffd000] font-black">${b.first}</span> <span class="text-gray-300 text-[11px]">${b.last}</span>`
+            : `<span class="text-white font-bold">${b.first}</span> <span class="blur-mask text-gray-300">${b.last}</span>`;
+
+          const multBadge = b.cashedOut
+            ? `<span class="font-mono-num text-[11px] font-black px-1.5 py-0.5 rounded ${b.cashoutMult >= 5 ? 'pill-pink' : 'pill-purple'}">${b.cashoutMult.toFixed(2)}x</span>`
+            : `<span class="text-gray-600 text-[11px]">—</span>`;
+
+          const payoutText = b.cashedOut
+            ? `<span class="font-mono-num font-black text-xs text-[#34e815]">${formatNGN(b.payout)}</span>`
+            : `<span class="text-gray-600 text-xs">—</span>`;
+
+          return `
+            <div class="grid grid-cols-12 items-center px-2.5 py-2 rounded-xl text-xs transition-all ${rowBg}">
+              <div class="col-span-5 truncate">
+                <div>${nameHtml}</div>
+                <div class="text-[10px] font-mono-num text-gray-500">${b.phone}</div>
+              </div>
+              <div class="col-span-3 text-right font-mono-num font-bold text-gray-200">${formatNGN(b.bet)}</div>
+              <div class="col-span-1 text-center">${multBadge}</div>
+              <div class="col-span-3 text-right">${payoutText}</div>
+            </div>
+          `;
+        }).join('');
+      } else if (currentFeedTab === 'my') {
+        if (myBetsHistory.length === 0) {
+          listEl.innerHTML = `<div class="text-center text-gray-500 text-xs py-12 font-bold">No personal rounds recorded yet. Place a bet to fly!</div>`;
+          return;
+        }
+        listEl.innerHTML = myBetsHistory.map(m => {
+          const won = m.status === 'WON';
+          return `
+            <div class="grid grid-cols-12 items-center px-2.5 py-2 rounded-xl text-xs ${won ? 'bg-[#122b16]/85 border border-[#28a909]/40' : 'bg-[#261418]/70 border border-red-900/40'}">
+              <div class="col-span-5">
+                <div class="font-extrabold text-white">Round #${m.round}</div>
+                <div class="text-[10px] font-bold ${won ? 'text-emerald-400' : 'text-red-400'}">${m.status}</div>
+              </div>
+              <div class="col-span-3 text-right font-mono-num font-bold text-gray-200">${formatNGN(m.bet)}</div>
+              <div class="col-span-1 text-center font-mono-num text-[11px] font-black text-purple-300">${m.mult.toFixed(2)}x</div>
+              <div class="col-span-3 text-right font-mono-num font-black ${won ? 'text-[#34e815]' : 'text-gray-500'}">${won ? formatNGN(m.win) : '0.00'}</div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        listEl.innerHTML = topWinsHistory.slice(0, 12).map(t => `
+          <div class="grid grid-cols-12 items-center px-2.5 py-2 rounded-xl text-xs bg-[#1b1626]/80 border border-purple-500/30">
+            <div class="col-span-5 truncate">
+              <div><span class="text-white font-bold">${t.name}</span> <span class="blur-mask text-gray-300">${t.surname}</span></div>
+              <div class="text-[10px] font-mono-num text-gray-400">${t.phone}</div>
+            </div>
+            <div class="col-span-3 text-right font-mono-num font-bold text-gray-200">${formatNGN(t.bet)}</div>
+            <div class="col-span-1 text-center"><span class="font-mono-num text-[10px] font-black px-1.5 py-0.5 rounded pill-pink">${t.mult.toFixed(1)}x</span></div>
+            <div class="col-span-3 text-right font-mono-num font-black text-[#ffd000]">${formatNGN(t.win)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // =========================================================================
+    // 7. HTML5 CANVAS FLIGHT ENGINE & SUNBURST GRAPHICS
+    // =========================================================================
     const canvas = document.getElementById('aviatorCanvas');
     const ctx = canvas.getContext('2d');
+    let sunRotation = 0;
+    let trailParticles = [];
+    let confettiParticles = [];
+    let flyAwayOffset = { x: 0, y: 0 };
 
     function resizeCanvas() {
       const rect = canvas.parentElement.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
 
-    function renderLoop() {
-      const w = canvas.width / window.devicePixelRatio;
-      const h = canvas.height / window.devicePixelRatio;
+    function spawnConfettiBurst() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      const colors = ['#ffd000', '#28a909', '#ff5ce8', '#34b4ff', '#ffffff'];
+      for (let i = 0; i < 65; i++) {
+        confettiParticles.push({
+          x: w * 0.5,
+          y: h * 0.45,
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.85) * 11,
+          color: colors[i % colors.length],
+          size: 4 + Math.random() * 5,
+          life: 85
+        });
+      }
+    }
+
+    function drawPlane(x, y, angleRad) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angleRad);
+
+      // Engine Exhaust Glow
+      const exhaustGrad = ctx.createRadialGradient(-26, 2, 1, -26, 2, 18);
+      exhaustGrad.addColorStop(0, 'rgba(255, 220, 100, 0.95)');
+      exhaustGrad.addColorStop(0.5, 'rgba(228, 24, 39, 0.55)');
+      exhaustGrad.addColorStop(1, 'rgba(228, 24, 39, 0)');
+      ctx.fillStyle = exhaustGrad;
+      ctx.beginPath();
+      ctx.arc(-26, 2, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Main Fuselage (Sporty Crimson Red)
+      ctx.fillStyle = '#e41827';
+      ctx.beginPath();
+      ctx.moveTo(26, 0);
+      ctx.quadraticCurveTo(12, -10, -22, -7);
+      ctx.lineTo(-30, -16);
+      ctx.lineTo(-26, -3);
+      ctx.lineTo(-28, 6);
+      ctx.quadraticCurveTo(6, 9, 26, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // White Racing Stripe
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(18, -1);
+      ctx.lineTo(-18, -3);
+      ctx.lineTo(-18, 1);
+      ctx.lineTo(18, 1);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cockpit Canopy
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.ellipse(4, -6, 8, 4, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Top & Bottom Biplane Wings
+      ctx.fillStyle = '#b60f1c';
+      ctx.fillRect(-4, -14, 14, 3.5);
+      ctx.fillStyle = '#ff3847';
+      ctx.fillRect(-2, 4, 13, 3.5);
+
+      // Spinning Propeller Blur
+      const propHeight = 14 + Math.sin(performance.now() * 0.08) * 6;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(27, -propHeight);
+      ctx.lineTo(27, propHeight);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function renderCanvas(now) {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
       ctx.clearRect(0, 0, w, h);
 
-      // Rotating Sunburst Rays
-      sunAngle += 0.002;
+      // 1. Dark Radial Sunburst Background
+      const bgGrad = ctx.createRadialGradient(w * 0.15, h * 0.88, 10, w * 0.5, h * 0.5, Math.max(w, h));
+      bgGrad.addColorStop(0, '#1d1424');
+      bgGrad.addColorStop(0.55, '#12151e');
+      bgGrad.addColorStop(1, '#0b0d12');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Rotating Subtle Sunburst Rays from bottom-left origin
+      sunRotation += 0.0018;
       ctx.save();
-      ctx.translate(40, h - 30);
-      ctx.rotate(sunAngle);
-      for (let i = 0; i < 24; i++) {
-        ctx.rotate((Math.PI * 2) / 24);
-        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.018)' : 'transparent';
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(w * 1.4, -40);
-        ctx.lineTo(w * 1.4, 40);
-        ctx.closePath();
-        ctx.fill();
+      ctx.translate(42, h - 36);
+      ctx.rotate(sunRotation);
+      const rayCount = 24;
+      for (let i = 0; i < rayCount; i++) {
+        if (i % 2 === 0) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.018)';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          const a1 = (i / rayCount) * Math.PI * 2;
+          const a2 = ((i + 1) / rayCount) * Math.PI * 2;
+          ctx.arc(0, 0, Math.max(w, h) * 1.4, a1, a2);
+          ctx.closePath();
+          ctx.fill();
+        }
       }
       ctx.restore();
 
-      // Axis Grid Lines
-      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      // Subtle Radar Grid Lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
       ctx.lineWidth = 1;
+      const step = 48;
+      for (let x = 42; x < w; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h - 28);
+        ctx.stroke();
+      }
+      for (let y = h - 28; y > 0; y -= step) {
+        ctx.beginPath();
+        ctx.moveTo(42, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Axis Borders
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(36, 16); ctx.lineTo(36, h - 28); ctx.lineTo(w - 16, h - 28);
+      ctx.moveTo(42, 16);
+      ctx.lineTo(42, h - 28);
+      ctx.lineTo(w - 16, h - 28);
       ctx.stroke();
 
+      // Axis Tick Dots
+      ctx.fillStyle = '#38bdf8';
+      for (let x = 70; x < w - 20; x += 55) {
+        ctx.beginPath();
+        ctx.arc(x, h - 28, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#ffffff';
+      for (let y = h - 60; y > 24; y -= 48) {
+        ctx.beginPath();
+        ctx.arc(42, y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2. Flight Curve & Plane Rendering
+      const startX = 46;
+      const startY = h - 32;
+
       if (gameState === 'FLYING') {
-        const elapsedSec = (performance.now() - flightStartPerf) / 1000;
-        const m = Math.max(1.00, Math.floor(Math.exp(0.065 * elapsedSec) * 100) / 100);
-        currentMultiplier = m;
-        document.getElementById('centerMult').textContent = `${m.toFixed(2)}x`;
+        const elapsed = (now - flightStartTime) / 1000;
+        const progress = Math.min(1, elapsed / 7.5);
+        const bobY = Math.sin(elapsed * 4.2) * 8;
 
-        // Update Cashout button amounts & trigger Auto-Cashout
-        [1, 2].forEach(p => {
-          if (panels[p].state === 'ACTIVE') {
-            renderPanelButton(p);
-            const autoCash = document.getElementById(`p${p}-autocash`).checked;
-            const target = parseFloat(document.getElementById(`p${p}-target`).value) || 2.00;
-            if (autoCash && m >= target && !panels[p].cashingOut) {
-              cashoutOnServer(p, target);
-            }
-          }
-        });
+        const endX = startX + (w - 135) * (0.18 + 0.74 * (1 - Math.exp(-elapsed * 0.42)));
+        const endY = startY - (h - 115) * (0.15 + 0.75 * (1 - Math.exp(-elapsed * 0.36))) + bobY;
 
-        // Guest spectator crash check
-        if ((!token || !activeRoundId) && m >= simulatedCrashPoint) {
-          triggerCrashState(simulatedCrashPoint, null, null);
-        }
+        const ctrlX = startX + (endX - startX) * 0.58;
+        const ctrlY = startY - (startY - endY) * 0.16;
 
-        // Draw Flight Curve & Jet
-        const progress = Math.min(1, elapsedSec / 9);
-        const startX = 40, startY = h - 32;
-        const endX = startX + (w - 115) * progress;
-        const endY = startY - (h - 95) * Math.pow(progress, 0.85) + Math.sin(elapsedSec * 3.5) * 6;
-        const ctrlX = startX + (endX - startX) * 0.55;
-        const ctrlY = startY;
+        // Glowing Red Area Fill Underneath Curve
+        const areaGrad = ctx.createLinearGradient(0, endY, 0, startY);
+        areaGrad.addColorStop(0, 'rgba(228, 24, 39, 0.36)');
+        areaGrad.addColorStop(1, 'rgba(228, 24, 39, 0.02)');
 
-        // Red Gradient Area Under Curve
-        const grad = ctx.createLinearGradient(0, endY, 0, startY);
-        grad.addColorStop(0, 'rgba(229, 9, 20, 0.35)');
-        grad.addColorStop(1, 'rgba(229, 9, 20, 0.0)');
-        ctx.fillStyle = grad;
+        ctx.fillStyle = areaGrad;
         ctx.beginPath();
         ctx.moveTo(startX, startY);
         ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
@@ -890,214 +1741,881 @@
         ctx.closePath();
         ctx.fill();
 
-        // Glowing Trajectory Stroke
-        ctx.strokeStyle = '#e50914';
+        // Glowing Red Trajectory Curve
+        ctx.save();
+        ctx.strokeStyle = '#e41827';
         ctx.lineWidth = 4;
+        ctx.shadowColor = '#e41827';
+        ctx.shadowBlur = 14;
         ctx.beginPath();
         ctx.moveTo(startX, startY);
         ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
         ctx.stroke();
-
-        // Draw Crimson Jet Biplane
-        ctx.save();
-        ctx.translate(endX, endY);
-        ctx.rotate(-0.22);
-        ctx.fillStyle = '#e50914';
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 26, 9, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-8, -14, 18, 4);
-        ctx.fillRect(-24, -10, 6, 12);
-        ctx.fillStyle = '#ffd000';
-        ctx.fillRect(25, -8, 3, 16);
         ctx.restore();
+
+        // Spawn Engine Trail Particles
+        if (Math.random() < 0.75) {
+          trailParticles.push({
+            x: endX - 24,
+            y: endY + 4,
+            vx: -1.5 - Math.random() * 2,
+            vy: (Math.random() - 0.5) * 1.2,
+            alpha: 0.75,
+            r: 2 + Math.random() * 3
+          });
+        }
+
+        // Tangent Angle for Plane Nose
+        const dx = endX - ctrlX;
+        const dy = endY - ctrlY;
+        const angle = Math.atan2(dy, dx);
+        drawPlane(endX, endY, angle);
+      } else if (gameState === 'CRASHED') {
+        // Zoom plane off-screen top-right
+        flyAwayOffset.x += 18;
+        flyAwayOffset.y -= 11;
+        const crashX = w * 0.65 + flyAwayOffset.x;
+        const crashY = h * 0.35 + flyAwayOffset.y;
+        if (crashX < w + 80 && crashY > -80) {
+          drawPlane(crashX, crashY, -0.45);
+        }
       }
 
-      requestAnimationFrame(renderLoop);
-    }
-
-    // Live Nigerian Flyers Feed
-    const liveFlyers = [
-      { first: 'Chinedu', last: 'Okafor',   p1: '0803', p2: '7492', p3: '819', stake: 5000,  mult: 2.45 },
-      { first: 'Amina',   last: 'Bello',    p1: '0814', p2: '3301', p3: '402', stake: 2000,  mult: 4.10 },
-      { first: 'Tunde',   last: 'Adeyemi',  p1: '0706', p2: '8821', p3: '915', stake: 10000, mult: 1.80 },
-      { first: 'Ngozi',   last: 'Eze',      p1: '0902', p2: '5190', p3: '673', stake: 1500,  mult: 12.50 },
-      { first: 'Ibrahim', last: 'Musa',     p1: '0809', p2: '6412', p3: '128', stake: 25000, mult: 1.50 },
-      { first: 'Funke',   last: 'Balogun',  p1: '0905', p2: '4718', p3: '894', stake: 3000,  mult: 6.20 },
-      { first: 'Emeka',   last: 'Nwosu',    p1: '0703', p2: '2984', p3: '751', stake: 8000,  mult: 3.15 }
-    ];
-
-    function switchFeedTab(tab) {
-      currentFeedTab = tab;
-      document.getElementById('tabAllBets').classList.toggle('active', tab === 'all');
-      document.getElementById('tabMyBets').classList.toggle('active', tab === 'my');
-      document.getElementById('tabTopWins').classList.toggle('active', tab === 'top');
-      renderSidebarFeed();
-    }
-
-    function renderSidebarFeed() {
-      const box = document.getElementById('betsListContainer');
-      box.innerHTML = '';
-
-      if (currentFeedTab === 'my') {
-        if (!myBetsHistory.length) {
-          box.innerHTML = '<div style="text-align:center; color:#9ca3af; font-size:12px; padding:24px;">No rounds played in this session yet.</div>';
-          return;
+      // Render Trail Particles
+      trailParticles.forEach(pt => {
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.alpha -= 0.025;
+        if (pt.alpha > 0) {
+          ctx.fillStyle = `rgba(255, 180, 180, ${pt.alpha})`;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2);
+          ctx.fill();
         }
-        myBetsHistory.slice(0, 20).forEach(b => {
-          const won = b.payout > 0;
-          box.insertAdjacentHTML('beforeend', `
-            <div class="bet-row ${won ? 'cashed' : ''}">
-              <span>${b.name}</span>
-              <span>₦${fmtNGN(b.stake)}</span>
-              <span class="mult-pill ${b.mult >= 5 ? 'high' : ''}">${won ? b.mult.toFixed(2) + 'x' : '—'}</span>
-              <span style="text-align:right; color:${won ? '#4ade80' : '#9ca3af'};">${won ? '₦' + fmtNGN(b.payout) : '—'}</span>
-            </div>`);
+      });
+      trailParticles = trailParticles.filter(pt => pt.alpha > 0);
+
+      // Render Confetti Particles
+      confettiParticles.forEach(cp => {
+        cp.x += cp.vx;
+        cp.y += cp.vy;
+        cp.vy += 0.25;
+        cp.life -= 1;
+        if (cp.life > 0) {
+          ctx.fillStyle = cp.color;
+          ctx.fillRect(cp.x, cp.y, cp.size, cp.size * 0.6);
+        }
+      });
+      confettiParticles = confettiParticles.filter(cp => cp.life > 0);
+    }
+
+    // =========================================================================
+    // 8. MAIN GAME STATE MACHINE LOOP (WAITING -> FLYING -> CRASHED)
+    // =========================================================================
+    let lastFrameTime = performance.now();
+
+    function startWaitingPhase() {
+      gameState = 'WAITING';
+      waitingTimeLeft = WAITING_DURATION;
+      currentMultiplier = 1.00;
+      trailParticles = [];
+
+      document.getElementById('waitingOverlay').classList.remove('hidden');
+      document.getElementById('flightOverlay').classList.add('hidden');
+      document.getElementById('flewAwayLabel').classList.add('hidden');
+      document.getElementById('liveMultiplierBadge').classList.add('hidden');
+      document.getElementById('multiplierDisplay').classList.remove('text-[#ff3b49]');
+      document.getElementById('multiplierDisplay').classList.add('text-white');
+
+      generateSimulatedRoundBets();
+      updatePanelButtons();
+    }
+
+    function startFlyingPhase() {
+      gameState = 'FLYING';
+      flightStartTime = performance.now();
+      currentMultiplier = 1.00;
+      flyAwayOffset = { x: 0, y: 0 };
+
+      document.getElementById('waitingOverlay').classList.add('hidden');
+      document.getElementById('flightOverlay').classList.remove('hidden');
+      document.getElementById('flightOverlay').classList.add('flex');
+      document.getElementById('liveMultiplierBadge').classList.remove('hidden');
+
+      playTakeoffSfx();
+      updatePanelButtons();
+    }
+
+    function triggerCrashPhase() {
+      gameState = 'CRASHED';
+      currentMultiplier = targetCrashPoint;
+
+      document.getElementById('multiplierDisplay').textContent = `${currentMultiplier.toFixed(2)}x`;
+      document.getElementById('multiplierDisplay').classList.remove('text-white');
+      document.getElementById('multiplierDisplay').classList.add('text-[#ff3b49]');
+      document.getElementById('flewAwayLabel').classList.remove('hidden');
+      document.getElementById('liveMultiplierBadge').classList.add('hidden');
+
+      // Record uncashed player bets as losses
+      [1, 2].forEach(panelId => {
+        const p = panels[panelId];
+        if (p.state === 'ACTIVE') {
+          myBetsHistory.unshift({
+            round: roundNumber,
+            bet: p.stake,
+            mult: currentMultiplier,
+            win: 0,
+            status: 'LOST'
+          });
+          p.state = 'IDLE';
+        }
+      });
+
+      // Push crash result to history ribbon
+      roundHistory.unshift(currentMultiplier);
+      if (roundHistory.length > 22) roundHistory.pop();
+      renderHistoryRibbon();
+
+      lastRevealedInfo = `Round #${roundNumber} • Seed: ${currentServerSeed.slice(0, 14)}... • Crashed @ ${currentMultiplier.toFixed(2)}x`;
+      roundNumber++;
+
+      playFlyAwaySfx();
+      updatePanelButtons();
+      if (currentFeedTab === 'my') renderFeed();
+
+      setTimeout(async () => {
+        await prepareNextRoundSeed();
+        startWaitingPhase();
+      }, 2800);
+    }
+
+    function gameLoop(now) {
+      const dt = (now - lastFrameTime) / 1000;
+      lastFrameTime = now;
+
+      if (gameState === 'WAITING') {
+        waitingTimeLeft = Math.max(0, waitingTimeLeft - dt);
+        const pct = (waitingTimeLeft / WAITING_DURATION) * 100;
+        document.getElementById('countdownBar').style.width = `${pct}%`;
+        document.getElementById('countdownSeconds').textContent = `${waitingTimeLeft.toFixed(1)}s`;
+
+        if (waitingTimeLeft <= 0) {
+          startFlyingPhase();
+        }
+      } else if (gameState === 'FLYING') {
+        const elapsed = (now - flightStartTime) / 1000;
+        // Exponential Aviator climb curve
+        currentMultiplier = parseFloat(Math.pow(Math.E, 0.068 * elapsed + 0.008 * elapsed * elapsed).toFixed(2));
+        if (currentMultiplier < 1.00) currentMultiplier = 1.00;
+
+        document.getElementById('multiplierDisplay').textContent = `${currentMultiplier.toFixed(2)}x`;
+
+        // Auto-Cashout Check for Player Panels
+        [1, 2].forEach(panelId => {
+          const p = panels[panelId];
+          if (p.state === 'ACTIVE' && p.autoCashEnabled) {
+            const target = parseFloat(document.getElementById(`p${panelId}AutoCashInput`).value) || 2.0;
+            if (currentMultiplier >= target) {
+              cashOutPanel(panelId);
+            }
+          }
         });
+
+        // Dynamic Cashouts for Simulated Nigerian Players
+        let feedChanged = false;
+        liveRoundBets.forEach(b => {
+          if (!b.isUser && !b.cashedOut && currentMultiplier >= b.plannedCashout && currentMultiplier < targetCrashPoint) {
+            b.cashedOut = true;
+            b.cashoutMult = currentMultiplier;
+            b.payout = parseFloat((b.bet * currentMultiplier).toFixed(2));
+            feedChanged = true;
+          }
+        });
+        if (feedChanged && currentFeedTab === 'all') {
+          renderFeed();
+        }
+
+        updatePanelButtons();
+
+        if (currentMultiplier >= targetCrashPoint) {
+          triggerCrashPhase();
+        }
+      }
+
+      renderCanvas(now);
+      requestAnimationFrame(gameLoop);
+    }
+
+    // =========================================================================
+    // 9. CASHIER & MODAL HANDLERS
+    // =========================================================================
+    function openCashier(tab) {
+      playClickSfx();
+      const modal = document.getElementById('cashierModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      switchCashierTab(tab);
+    }
+
+    function switchCashierTab(tab) {
+      const isDep = tab === 'deposit';
+      document.getElementById('cashierTabDep').className = isDep
+        ? 'py-2 rounded-lg bg-[#28a909] text-white transition cursor-pointer'
+        : 'py-2 rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+      document.getElementById('cashierTabWdr').className = !isDep
+        ? 'py-2 rounded-lg bg-amber-600 text-white transition cursor-pointer'
+        : 'py-2 rounded-lg text-gray-400 hover:text-white transition cursor-pointer';
+
+      document.getElementById('cashierDepositBody').style.display = isDep ? 'flex' : 'none';
+      document.getElementById('cashierWithdrawBody').style.display = !isDep ? 'flex' : 'none';
+    }
+
+    function processDeposit() {
+      const amt = parseFloat(document.getElementById('depositAmountInput').value);
+      if (isNaN(amt) || amt < 100) {
+        showToast('Minimum NGN deposit is ₦100.00', 'error');
+        return;
+      }
+      balanceNGN = parseFloat((balanceNGN + amt).toFixed(2));
+      updateBalanceUI();
+      closeModals();
+      playCashoutSfx(false);
+      showToast(`Deposited NGN ${formatNGN(amt)} into PLUGBET wallet!`, 'win');
+    }
+
+    function processWithdrawal() {
+      const bank = document.getElementById('withdrawBankSelect').value;
+      const acct = document.getElementById('withdrawAccountInput').value.trim();
+      const amt = parseFloat(document.getElementById('withdrawAmountInput').value);
+
+      if (acct.length !== 10 || !/^\d+$/.test(acct)) {
+        showToast('Enter a valid 10-digit Nigerian NUBAN account number', 'error');
+        return;
+      }
+      if (isNaN(amt) || amt < 1000) {
+        showToast('Minimum withdrawal is NGN 1,000.00', 'error');
+        return;
+      }
+      if (amt > balanceNGN) {
+        showToast('Insufficient NGN balance for withdrawal', 'error');
         return;
       }
 
-      const list = currentFeedTab === 'top'
-        ? [...liveFlyers].sort((a, b) => (b.stake * b.mult) - (a.stake * a.mult))
-        : liveFlyers;
-
-      list.forEach(f => {
-        const payout = f.stake * f.mult;
-        box.insertAdjacentHTML('beforeend', `
-          <div class="bet-row cashed">
-            <div>
-              <div>${f.first} <span class="blur-mask">${f.last}</span></div>
-              <div style="font-size:10px; color:#9ca3af; font-family:monospace;">${f.p1}<span class="blur-mask">${f.p2}</span>${f.p3}</div>
-            </div>
-            <span>₦${fmtNGN(f.stake)}</span>
-            <span class="mult-pill ${f.mult >= 5 ? 'high' : ''}">${f.mult.toFixed(2)}x</span>
-            <span style="text-align:right; color:#4ade80;">₦${fmtNGN(payout)}</span>
-          </div>`);
-      });
+      balanceNGN = parseFloat((balanceNGN - amt).toFixed(2));
+      updateBalanceUI();
+      closeModals();
+      playClickSfx();
+      showToast(`Payout of NGN ${formatNGN(amt)} sent to ${bank} (${acct})`, 'info');
     }
 
-    // Auth & Paystack Cashier
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open')); }
-    function openCashier(tab) { if (!token) return openModal('loginModal'); switchCashierTab(tab); openModal('cashierModal'); }
-    function switchCashierTab(tab) {
-      const isDep = tab === 'deposit';
-      document.getElementById('tabDeposit').classList.toggle('active', isDep);
-      document.getElementById('tabWithdraw').classList.toggle('active', !isDep);
-      document.getElementById('depositPanel').style.display = isDep ? 'flex' : 'none';
-      document.getElementById('withdrawPanel').style.display = isDep ? 'none' : 'flex';
+    function openFairModal() {
+      playClickSfx();
+      const modal = document.getElementById('fairModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
     }
 
-    function syncAuthUI() {
-      if (token) {
-        document.getElementById('guestActions').style.display = 'none';
-        document.getElementById('userActions').style.display = 'flex';
-        document.getElementById('navUsername').textContent = username;
-        fetchBalance();
-        verifyPaystackCallback();
-      } else {
-        document.getElementById('guestActions').style.display = 'flex';
-        document.getElementById('userActions').style.display = 'none';
-        document.getElementById('topBalance').textContent = '0.00';
-      }
+    function closeModals() {
+      document.getElementById('cashierModal').classList.add('hidden');
+      document.getElementById('cashierModal').classList.remove('flex');
+      document.getElementById('fairModal').classList.add('hidden');
+      document.getElementById('fairModal').classList.remove('flex');
     }
 
-    async function registerUser() {
-      const u = document.getElementById('regUser').value, p = document.getElementById('regPass').value;
-      const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
-      const data = await res.json();
-      if (res.ok) {
-        token = data.token; username = data.username || u;
-        localStorage.setItem('casino_token', token); localStorage.setItem('casino_user', username);
-        closeModals(); syncAuthUI();
-        showWinToast(`Welcome to PLUGBET! NGN ${fmtNGN(data.balance)} bonus credited.`);
-      } else alert(data.error || 'Registration failed');
-    }
+    // =========================================================================
+    // 10. INITIALIZE APPLICATION ON WINDOW LOAD
+    // =========================================================================
+    // 10. MULTI-PORT NAVIGATION, LIVE BETTING, INSTANT FOOTBALL, JACKPOT & CINEFLOW AI
+    // =========================================================================
+    let activePort = 'aviator';
 
-    async function loginUser() {
-      const u = document.getElementById('loginUser').value, p = document.getElementById('loginPass').value;
-      const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
-      const data = await res.json();
-      if (res.ok) {
-        token = data.token; username = data.username || u;
-        localStorage.setItem('casino_token', token); localStorage.setItem('casino_user', username);
-        closeModals(); syncAuthUI();
-      } else alert(data.error || 'Login failed');
-    }
-
-    function logout() {
-      token = ''; username = '';
-      localStorage.removeItem('casino_token'); localStorage.removeItem('casino_user');
-      syncAuthUI();
-    }
-
-    async function fetchBalance() {
-      if (!token) return;
-      const res = await fetch('/api/balance', { headers: { 'Authorization': `Bearer ${token}` } });
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById('topBalance').textContent = fmtNGN(data.balance);
-      } else logout();
-    }
-
-    async function submitDeposit() {
-      const amount = parseFloat(document.getElementById('depositAmount').value);
-      const email = document.getElementById('depositEmail').value;
-      const btn = document.getElementById('depositSubmitBtn');
-      btn.disabled = true; btn.textContent = 'Connecting to Paystack...';
-
-      const res = await fetch('/api/deposit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ amount, email })
-      });
-      const data = await res.json();
-      btn.disabled = false; btn.textContent = 'Pay with Paystack';
-
-      if (res.ok) {
-        if (data.payment_url) window.location.href = data.payment_url;
-        else {
-          document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-          closeModals();
-          showWinToast(`Deposited +NGN ${fmtNGN(amount)}!`);
+    function switchMainPort(port) {
+      playClickSfx();
+      activePort = port;
+      const ports = ['aviator', 'live', 'instant', 'jackpot', 'cineflow'];
+      ports.forEach(p => {
+        const el = document.getElementById(`port-${p}`);
+        if (el) {
+          if (p === port) {
+            el.classList.remove('hidden');
+            el.classList.add('grid');
+          } else {
+            el.classList.add('hidden');
+            el.classList.remove('grid');
+          }
         }
-      } else alert(data.error || 'Deposit failed');
+
+        const dBtn = document.getElementById(`nav-${p}`);
+        const mBtn = document.getElementById(`mnav-${p}`);
+        if (dBtn) {
+          if (p === port) {
+            dBtn.className = 'px-3 py-1.5 rounded bg-white text-[#e41827] font-black shadow-sm flex items-center gap-1 cursor-pointer transition';
+          } else if (p === 'cineflow') {
+            dBtn.className = 'px-2.5 py-1.5 rounded bg-black/25 hover:bg-black/40 border border-[#ffd000]/60 text-[#ffd000] transition flex items-center gap-1 cursor-pointer';
+          } else {
+            dBtn.className = 'px-2.5 py-1.5 rounded hover:bg-black/15 text-white transition flex items-center gap-1 cursor-pointer';
+          }
+        }
+        if (mBtn) {
+          mBtn.className = p === port
+            ? 'px-2.5 py-1 rounded bg-white text-[#e41827] shrink-0 cursor-pointer'
+            : (p === 'cineflow'
+              ? 'px-2.5 py-1 rounded bg-black/30 text-[#ffd000] border border-[#ffd000]/40 shrink-0 cursor-pointer'
+              : 'px-2.5 py-1 rounded bg-black/20 text-white shrink-0 cursor-pointer');
+        }
+      });
+
+      if (port === 'aviator') {
+        setTimeout(resizeCanvas, 50);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function verifyPaystackCallback() {
-      const params = new URLSearchParams(window.location.search);
-      const ref = params.get('reference') || params.get('trxref');
-      if (!ref || !token) return;
-      const res = await fetch(`/api/deposit/verify/${encodeURIComponent(ref)}`, { headers: { 'Authorization': `Bearer ${token}` } });
-      const data = await res.json();
-      window.history.replaceState({}, document.title, '/');
-      if (res.ok && data.status === 'completed') {
-        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-        showWinToast(`Paystack Verified +NGN ${fmtNGN(data.amountNGN)}!`);
+    // --- PORT 2: LIVE BETTING ENGINE ---
+    const liveMatches = [
+      { id: 'm1', league: 'NPFL Nigeria', home: 'Enyimba FC', away: 'Kano Pillars', scoreH: 1, scoreA: 0, min: 58, o1: 1.55, oX: 3.40, o2: 5.20, o25: 1.85 },
+      { id: 'm2', league: 'Premier League', home: 'Arsenal', away: 'Liverpool', scoreH: 2, scoreA: 2, min: 71, o1: 2.65, oX: 2.35, o2: 2.95, o25: 1.18 },
+      { id: 'm3', league: 'La Liga', home: 'Real Madrid', away: 'Barcelona', scoreH: 1, scoreA: 1, min: 44, o1: 2.15, oX: 3.10, o2: 3.25, o25: 1.48 },
+      { id: 'm4', league: 'Serie A', home: 'Napoli', away: 'AC Milan', scoreH: 0, scoreA: 1, min: 63, o1: 4.10, oX: 2.90, o2: 1.88, o25: 2.05 },
+      { id: 'm5', league: 'Champions League', home: 'Man City', away: 'Bayern Munich', scoreH: 2, scoreA: 1, min: 52, o1: 1.45, oX: 4.30, o2: 6.10, o25: 1.25 },
+      { id: 'm6', league: 'NPFL Nigeria', home: 'Remo Stars', away: 'Rivers United', scoreH: 0, scoreA: 0, min: 34, o1: 2.25, oX: 2.85, o2: 3.40, o25: 2.30 }
+    ];
+    let betSlip = [];
+    let openLiveTickets = [];
+
+    function renderLiveMatches() {
+      const wrap = document.getElementById('liveMatchesList');
+      if (!wrap) return;
+      wrap.innerHTML = liveMatches.map(m => {
+        const isPicked = (mkt) => betSlip.some(s => s.matchId === m.id && s.market === mkt);
+        const btnCls = (mkt) => isPicked(mkt)
+          ? 'bg-[#28a909] text-white border-[#4be324]'
+          : 'bg-[#0e1015] hover:bg-[#222733] text-white border-[#2c3240]';
+
+        return `
+          <div class="bg-[#171a21] border border-[#262b36] rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 text-[11px] font-bold text-gray-400">
+                <span class="text-red-400 font-mono-num font-black">${m.min}'</span>
+                <span>•</span>
+                <span>${m.league}</span>
+              </div>
+              <div class="font-extrabold text-sm text-white mt-1 flex items-center justify-between sm:justify-start sm:gap-4">
+                <span>${m.home} vs ${m.away}</span>
+                <span class="font-mono-num text-[#ffd000] bg-black/40 px-2 py-0.5 rounded">${m.scoreH} - ${m.scoreA}</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 sm:w-80 text-xs font-mono-num font-black">
+              <button onclick="toggleSlipPick('${m.id}', '1', ${m.o1})" class="py-2 rounded-xl border transition cursor-pointer ${btnCls('1')}">
+                <div class="text-[9px] opacity-70 font-sans">1</div>${m.o1.toFixed(2)}
+              </button>
+              <button onclick="toggleSlipPick('${m.id}', 'X', ${m.oX})" class="py-2 rounded-xl border transition cursor-pointer ${btnCls('X')}">
+                <div class="text-[9px] opacity-70 font-sans">X</div>${m.oX.toFixed(2)}
+              </button>
+              <button onclick="toggleSlipPick('${m.id}', '2', ${m.o2})" class="py-2 rounded-xl border transition cursor-pointer ${btnCls('2')}">
+                <div class="text-[9px] opacity-70 font-sans">2</div>${m.o2.toFixed(2)}
+              </button>
+              <button onclick="toggleSlipPick('${m.id}', 'O2.5', ${m.o25})" class="py-2 rounded-xl border transition cursor-pointer ${btnCls('O2.5')}">
+                <div class="text-[9px] opacity-70 font-sans">O2.5</div>${m.o25.toFixed(2)}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSlipPick(matchId, market, odd) {
+      playClickSfx();
+      const match = liveMatches.find(m => m.id === matchId);
+      const existingIdx = betSlip.findIndex(s => s.matchId === matchId);
+      if (existingIdx !== -1 && betSlip[existingIdx].market === market) {
+        betSlip.splice(existingIdx, 1);
+      } else {
+        if (existingIdx !== -1) betSlip.splice(existingIdx, 1);
+        betSlip.push({ matchId, label: `${match.home} vs ${match.away}`, market, odd });
+      }
+      renderLiveMatches();
+      renderBetSlip();
+    }
+
+    function clearBetSlip() {
+      betSlip = [];
+      renderLiveMatches();
+      renderBetSlip();
+    }
+
+    function renderBetSlip() {
+      const box = document.getElementById('betSlipItems');
+      const stake = Math.max(50, parseFloat(document.getElementById('slipStakeInput').value) || 0);
+      if (betSlip.length === 0) {
+        box.innerHTML = `<div class="text-center text-xs text-gray-500 py-8 font-bold">Tap any live odds (1 / X / 2 / O2.5) to build your ticket.</div>`;
+        document.getElementById('slipTotalOdds').textContent = '1.00';
+        document.getElementById('slipPotentialWin').textContent = 'NGN 0.00';
+        return;
+      }
+
+      let totalOdd = 1;
+      box.innerHTML = betSlip.map(s => {
+        totalOdd *= s.odd;
+        return `
+          <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl p-2.5 flex items-center justify-between text-xs">
+            <div>
+              <div class="font-extrabold text-white">${s.label}</div>
+              <div class="text-[11px] text-emerald-400 font-bold">Pick: ${s.market}</div>
+            </div>
+            <span class="font-mono-num font-black text-[#ffd000]">${s.odd.toFixed(2)}</span>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('slipTotalOdds').textContent = totalOdd.toFixed(2);
+      document.getElementById('slipPotentialWin').textContent = `NGN ${formatNGN(stake * totalOdd)}`;
+    }
+
+    function placeLiveBet() {
+      if (betSlip.length === 0) {
+        showToast('Select at least one live match odd first!', 'error');
+        return;
+      }
+      const stake = parseFloat(document.getElementById('slipStakeInput').value);
+      if (isNaN(stake) || stake < 50 || stake > balanceNGN) {
+        showToast('Invalid stake or insufficient NGN balance', 'error');
+        return;
+      }
+      const totalOdd = betSlip.reduce((acc, s) => acc * s.odd, 1);
+      balanceNGN = parseFloat((balanceNGN - stake).toFixed(2));
+      updateBalanceUI();
+
+      openLiveTickets.unshift({
+        id: `TK-${Math.floor(10000 + Math.random() * 90000)}`,
+        legs: betSlip.length,
+        stake,
+        totalOdd: parseFloat(totalOdd.toFixed(2)),
+        potentialWin: parseFloat((stake * totalOdd).toFixed(2))
+      });
+      clearBetSlip();
+      renderOpenTickets();
+      playClickSfx();
+      showToast(`Live Bet placed! Potential Win: NGN ${formatNGN(stake * totalOdd)}`, 'info');
+    }
+
+    function renderOpenTickets() {
+      const el = document.getElementById('openTicketsList');
+      if (!openLiveTickets.length) {
+        el.innerHTML = 'No open live tickets.';
+        return;
+      }
+      el.innerHTML = openLiveTickets.map(t => `
+        <div class="bg-[#0e1015] border border-[#2c3240] rounded-lg p-2 flex items-center justify-between">
+          <span>${t.id} (${t.legs} legs @ ${t.totalOdd}x)</span>
+          <span class="text-[#ffd000] font-mono-num">₦${formatNGN(t.potentialWin)}</span>
+        </div>
+      `).join('');
+    }
+
+    function settleLiveSlip() {
+      if (!openLiveTickets.length) {
+        showToast('Place a live bet first to simulate full-time settlement.', 'info');
+        return;
+      }
+      let wonTotal = 0;
+      openLiveTickets.forEach(t => {
+        if (Math.random() < 0.55) {
+          wonTotal += t.potentialWin;
+        }
+      });
+      openLiveTickets = [];
+      renderOpenTickets();
+      if (wonTotal > 0) {
+        balanceNGN = parseFloat((balanceNGN + wonTotal).toFixed(2));
+        updateBalanceUI();
+        playCashoutSfx(true);
+        showToast(`Full-Time! Your Live Betting tickets won NGN ${formatNGN(wonTotal)}!`, 'win');
+      } else {
+        playFlyAwaySfx();
+        showToast('Full-Time! Ticket did not land this round. Try another slip!', 'error');
       }
     }
 
-    async function submitWithdrawal() {
-      const bankName = document.getElementById('bankName').value;
-      const accountNumber = document.getElementById('accountNumber').value.trim();
-      const accountName = document.getElementById('accountName').value.trim();
-      const amount = parseFloat(document.getElementById('withdrawAmount').value);
-      const res = await fetch('/api/withdraw', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ bankName, accountNumber, accountName, amount })
+    // Drift live odds slightly every 4 seconds
+    setInterval(() => {
+      liveMatches.forEach(m => {
+        m.min = m.min >= 90 ? 12 : m.min + 1;
+        m.o1 = Math.max(1.15, parseFloat((m.o1 + (Math.random() - 0.5) * 0.08).toFixed(2)));
+        m.o2 = Math.max(1.15, parseFloat((m.o2 + (Math.random() - 0.5) * 0.08).toFixed(2)));
       });
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById('topBalance').textContent = fmtNGN(data.newBalance);
-        closeModals();
-        showWinToast(`Withdrawal of NGN ${fmtNGN(amount)} sent to ${bankName}!`);
-      } else alert(data.error || 'Withdrawal failed');
+      if (activePort === 'live') renderLiveMatches();
+    }, 4000);
+
+    // --- PORT 3: INSTANT FOOTBALL SIMULATOR ---
+    const vfFixtures = [
+      { id: 0, home: 'Arsenal', away: 'Chelsea', oH: 2.10, oD: 3.25, oA: 3.10 },
+      { id: 1, home: 'Man City', away: 'Liverpool', oH: 1.95, oD: 3.40, oA: 3.35 },
+      { id: 2, home: 'Enyimba', away: 'Kano Pillars', oH: 1.80, oD: 3.20, oA: 4.10 },
+      { id: 3, home: 'Real Madrid', away: 'PSG', oH: 2.05, oD: 3.50, oA: 3.05 }
+    ];
+    let selectedVfIdx = 0;
+    let selectedVfPick = 'HOME';
+    let vfRunning = false;
+
+    function renderVfFixtures() {
+      const grid = document.getElementById('vfFixtureGrid');
+      if (!grid) return;
+      grid.innerHTML = vfFixtures.map((f, idx) => `
+        <button onclick="chooseVfFixture(${idx})" class="p-3 rounded-xl border text-left transition cursor-pointer ${idx === selectedVfIdx ? 'bg-[#222733] border-[#28a909]' : 'bg-[#0e1015] border-[#2c3240] hover:border-gray-500'}">
+          <div class="font-black text-xs text-white">${f.home} vs ${f.away}</div>
+          <div class="text-[11px] font-mono-num text-gray-400 mt-1">1: ${f.oH.toFixed(2)} • X: ${f.oD.toFixed(2)} • 2: ${f.oA.toFixed(2)}</div>
+        </button>
+      `).join('');
+      const cur = vfFixtures[selectedVfIdx];
+      document.getElementById('vfHomeName').textContent = cur.home;
+      document.getElementById('vfAwayName').textContent = cur.away;
+      document.getElementById('vfOddHome').textContent = cur.oH.toFixed(2);
+      document.getElementById('vfOddDraw').textContent = cur.oD.toFixed(2);
+      document.getElementById('vfOddAway').textContent = cur.oA.toFixed(2);
     }
 
-    renderSidebarFeed();
-    syncAuthUI();
-    startBoardingPhase();
-    requestAnimationFrame(renderLoop);
+    function chooseVfFixture(idx) {
+      if (vfRunning) return;
+      playClickSfx();
+      selectedVfIdx = idx;
+      renderVfFixtures();
+    }
+
+    function selectVfPick(pick) {
+      if (vfRunning) return;
+      playClickSfx();
+      selectedVfPick = pick;
+      ['HOME', 'DRAW', 'AWAY'].forEach(p => {
+        const el = document.getElementById(`vfPick${p.charAt(0) + p.slice(1).toLowerCase()}`);
+        el.className = p === pick
+          ? 'py-3 rounded-xl bg-[#262b36] border-2 border-[#28a909] text-white font-black text-xs flex flex-col items-center cursor-pointer'
+          : 'py-3 rounded-xl bg-[#0e1015] border border-[#2c3240] text-gray-300 font-black text-xs flex flex-col items-center cursor-pointer';
+      });
+    }
+
+    function startInstantMatch() {
+      if (vfRunning) return;
+      const stake = parseFloat(document.getElementById('vfStakeInput').value);
+      if (isNaN(stake) || stake < 100 || stake > balanceNGN) {
+        showToast('Enter a valid stake (min ₦100) within your NGN balance', 'error');
+        return;
+      }
+      balanceNGN = parseFloat((balanceNGN - stake).toFixed(2));
+      updateBalanceUI();
+
+      vfRunning = true;
+      const btn = document.getElementById('vfKickoffBtn');
+      btn.disabled = true;
+      btn.textContent = '⚽ MATCH IN PROGRESS...';
+
+      const fixture = vfFixtures[selectedVfIdx];
+      let min = 0, gH = 0, gA = 0;
+      document.getElementById('vfScoreboard').textContent = '0 - 0';
+      document.getElementById('vfCommentary').textContent = `Kick off! ${fixture.home} vs ${fixture.away} underway!`;
+      playTakeoffSfx();
+
+      const timer = setInterval(() => {
+        min += 5;
+        document.getElementById('vfMatchClock').textContent = `${min}'`;
+        if (Math.random() < 0.17) {
+          if (Math.random() < 0.54) {
+            gH++;
+            document.getElementById('vfCommentary').textContent = `⚽ ${min}' GOAL! ${fixture.home} strikes!`;
+          } else {
+            gA++;
+            document.getElementById('vfCommentary').textContent = `⚽ ${min}' GOAL! ${fixture.away} scores!`;
+          }
+          document.getElementById('vfScoreboard').textContent = `${gH} - ${gA}`;
+          playClickSfx();
+        }
+
+        if (min >= 90) {
+          clearInterval(timer);
+          vfRunning = false;
+          btn.disabled = false;
+          btn.textContent = '⚡ KICK OFF MATCH';
+
+          const outcome = gH > gA ? 'HOME' : gA > gH ? 'AWAY' : 'DRAW';
+          const odd = outcome === 'HOME' ? fixture.oH : outcome === 'AWAY' ? fixture.oA : fixture.oD;
+          const won = outcome === selectedVfPick;
+          const payout = won ? parseFloat((stake * odd).toFixed(2)) : 0;
+
+          if (won) {
+            balanceNGN = parseFloat((balanceNGN + payout).toFixed(2));
+            updateBalanceUI();
+            playCashoutSfx(true);
+            document.getElementById('vfCommentary').textContent = `🏆 FULL TIME ${gH}-${gA}! You won NGN ${formatNGN(payout)}!`;
+            showToast(`Instant Football Win! +NGN ${formatNGN(payout)}`, 'win');
+          } else {
+            playFlyAwaySfx();
+            document.getElementById('vfCommentary').textContent = `Full Time ${gH}-${gA} (${outcome}). Better luck next kick-off!`;
+          }
+
+          const log = document.getElementById('vfResultsLog');
+          log.insertAdjacentHTML('afterbegin', `
+            <div class="flex justify-between bg-[#0e1015] px-2.5 py-1.5 rounded-lg border border-[#262b36]">
+              <span>${fixture.home} ${gH}-${gA} ${fixture.away}</span>
+              <span class="font-mono-num font-black ${won ? 'text-[#34e815]' : 'text-red-400'}">${won ? '+₦' + formatNGN(payout) : 'LOST'}</span>
+            </div>
+          `);
+        }
+      }, 360);
+    }
+
+    // --- PORT 4: JACKPOT SUPER 6 & RAIN VAULT ---
+    const jpFixtures = [
+      'Man Utd vs Tottenham', 'Inter Milan vs Juventus', 'Atletico vs Sevilla',
+      'Dortmund vs RB Leipzig', 'Enyimba vs Shooting Stars', 'Lyon vs Marseille'
+    ];
+    let jpSelections = {};
+
+    function renderJackpotFixtures() {
+      const box = document.getElementById('jackpotFixturesList');
+      if (!box) return;
+      box.innerHTML = jpFixtures.map((name, idx) => `
+        <div class="bg-[#0e1015] border border-[#2c3240] rounded-xl p-3 flex flex-col gap-2">
+          <div class="text-xs font-extrabold text-white">${idx + 1}. ${name}</div>
+          <div class="grid grid-cols-3 gap-1.5 text-xs font-black">
+            ${['1', 'X', '2'].map(opt => `
+              <button onclick="pickJp(${idx}, '${opt}')" class="py-1.5 rounded-lg border cursor-pointer ${jpSelections[idx] === opt ? 'bg-[#28a909] text-white border-[#4be324]' : 'bg-[#171a21] text-gray-300 border-[#2c3240]'}">${opt}</button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('jpSelectedCount').textContent = `${Object.keys(jpSelections).length}/6`;
+    }
+
+    function pickJp(idx, opt) {
+      playClickSfx();
+      jpSelections[idx] = opt;
+      renderJackpotFixtures();
+    }
+
+    function quickPickJackpot() {
+      playClickSfx();
+      const opts = ['1', 'X', '2'];
+      jpFixtures.forEach((_, idx) => {
+        jpSelections[idx] = opts[Math.floor(Math.random() * 3)];
+      });
+      renderJackpotFixtures();
+    }
+
+    function submitJackpotTicket() {
+      if (Object.keys(jpSelections).length < 6) {
+        showToast('Pick all 6 fixtures (or tap Quick Pick All 6)!', 'error');
+        return;
+      }
+      if (balanceNGN < 200) {
+        showToast('Need NGN 200.00 to enter the NGN 10M Jackpot', 'error');
+        return;
+      }
+      balanceNGN = parseFloat((balanceNGN - 200).toFixed(2));
+      updateBalanceUI();
+
+      // Instant Draw Simulation
+      const opts = ['1', 'X', '2'];
+      let hits = 0;
+      jpFixtures.forEach((_, idx) => {
+        if (jpSelections[idx] === opts[Math.floor(Math.random() * 3)]) hits++;
+      });
+
+      const prizes = { 0: 0, 1: 0, 2: 0, 3: 500, 4: 5000, 5: 75000, 6: 10458200 };
+      const win = prizes[hits] || 0;
+      if (win > 0) {
+        balanceNGN = parseFloat((balanceNGN + win).toFixed(2));
+        updateBalanceUI();
+        playCashoutSfx(true);
+        showToast(`Super 6 Result: ${hits}/6 Correct! Won NGN ${formatNGN(win)}!`, 'win');
+      } else {
+        playClickSfx();
+        showToast(`Super 6 Result: ${hits}/6 matched. Entry logged for daily Rain!`, 'info');
+      }
+      jpSelections = {};
+      renderJackpotFixtures();
+    }
+
+    function crackJackpotVault() {
+      if (balanceNGN < 500) {
+        showToast('Need NGN 500.00 to crack the Rain Vault', 'error');
+        return;
+      }
+      balanceNGN = parseFloat((balanceNGN - 500).toFixed(2));
+      updateBalanceUI();
+      const rolls = [0, 0, 250, 500, 1000, 2500, 10000, 25000];
+      const prize = rolls[Math.floor(Math.random() * rolls.length)];
+      document.getElementById('vaultDisplay').textContent = prize > 0 ? `+₦${formatNGN(prize)}` : 'EMPTY VAULT';
+
+      if (prize > 0) {
+        balanceNGN = parseFloat((balanceNGN + prize).toFixed(2));
+        updateBalanceUI();
+        playCashoutSfx(prize >= 2500);
+        showToast(`Vault Cracked! Won NGN ${formatNGN(prize)}!`, 'win');
+      } else {
+        playFlyAwaySfx();
+      }
+      document.getElementById('vaultHistory').insertAdjacentHTML('beforeend', `
+        <div class="flex justify-between font-mono-num">
+          <span>Vault Attempt</span>
+          <span class="${prize > 0 ? 'text-[#34e815]' : 'text-gray-500'}">${prize > 0 ? '+₦' + formatNGN(prize) : '₦0.00'}</span>
+        </div>
+      `);
+    }
+
+    // --- PORT 5: CINEFLOW AI STUDIO & EARN NOW ENGINE ---
+    let cfEarnedTotal = 0;
+    let cfClipReady = false;
+
+    async function generateViralHookWithGemini(source, lang, topic) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      const prompt = `Create a punchy 1-line viral TikTok/Reels hook (max 10 words, all caps) and a 2-sentence word-by-word caption script in ${lang} for a 9:16 short video about "${topic || source}" on PLUGBET Nigeria. Return JSON with keys "hook" and "caption".`;
+
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              hook: { type: "STRING" },
+              caption: { type: "STRING" }
+            }
+          }
+        }
+      };
+
+      const delays = [1000, 2000];
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('API throttle');
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) return JSON.parse(text);
+        } catch (e) {
+          if (attempt < delays.length) {
+            await new Promise(r => setTimeout(r, delays[attempt]));
+          }
+        }
+      }
+
+      // Instant high-converting fallback if offline
+      const fallbacks = {
+        aviator: {
+          hook: "HE WAITED FOR 14.8X ON PLUGBET AVIATOR! 🚀🔥",
+          caption: "Watch how ₦1,000 turned into instant NGN payout in 12 seconds flat. Reframed in 9:16 with CineFlow AI!"
+        },
+        football: {
+          hook: "90TH MINUTE WINNER PAID OUT INSTANTLY! ⚽💰",
+          caption: "Zero waiting, pure adrenaline on PLUGBET Instant Football. Auto-captioned and ready for TikTok & Reels."
+        },
+        podcast: {
+          hook: "STOP EDITING MANUALLY — LET CINEFLOW DO IT! 🎬⚡",
+          caption: "From raw 16:9 footage to 95/100 viral 9:16 shorts in under 30 seconds with automated captions."
+        },
+        promo: {
+          hook: "NGN 10,000,000 PLUGBET JACKPOT BREAKDOWN! 🏆🇳🇬",
+          caption: "Drop your Super 6 picks and clip your winning reactions with CineFlow to earn extra creator bounties!"
+        }
+      };
+      return fallbacks[source] || fallbacks.aviator;
+    }
+
+    async function runCineFlowPipeline() {
+      const btn = document.getElementById('cfGenerateBtn');
+      const wrap = document.getElementById('cfProgressWrap');
+      const bar = document.getElementById('cfProgressBar');
+      const stage = document.getElementById('cfProgressStage');
+      const pct = document.getElementById('cfProgressPct');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ PROCESSING IN CINEFLOW AI...';
+      wrap.classList.remove('hidden');
+      wrap.classList.add('flex');
+
+      const steps = [
+        { p: 30, label: '1/3 Running Whisper AI Transcription & Translation...' },
+        { p: 65, label: '2/3 Applying Intelligent 9:16 Subject Reframing...' },
+        { p: 92, label: '3/3 Generating Viral Hook & Word-by-Word Captions...' }
+      ];
+
+      const source = document.getElementById('cfSourceSelect').value;
+      const lang = document.getElementById('cfLangSelect').value;
+      const topic = document.getElementById('cfTopicInput').value.trim();
+
+      const aiPromise = generateViralHookWithGemini(source, lang, topic);
+
+      for (const s of steps) {
+        stage.textContent = s.label;
+        pct.textContent = `${s.p}%`;
+        bar.style.width = `${s.p}%`;
+        await new Promise(r => setTimeout(r, 550));
+      }
+
+      const result = await aiPromise;
+      stage.textContent = '✅ 9:16 Viral Short Ready for Multi-Platform Publishing!';
+      pct.textContent = '100%';
+      bar.style.width = '100%';
+
+      document.getElementById('cfPreviewHook').textContent = `"${result.hook}"`;
+      document.getElementById('cfPreviewCaption').textContent = result.caption;
+      const score = 93 + Math.floor(Math.random() * 6);
+      document.getElementById('cfViralScore').textContent = `${score}/100 Viral Score`;
+
+      cfClipReady = true;
+      btn.disabled = false;
+      btn.textContent = '⚡ GENERATE ANOTHER 9:16 CLIP';
+      playCashoutSfx(false);
+      showToast('CineFlow 9:16 viral clip rendered! Click Publish to Earn ₦2,500.', 'info');
+    }
+
+    function publishAndEarnCineFlow() {
+      if (!cfClipReady) {
+        showToast('Generate a 9:16 viral clip first to unlock the ₦2,500 publish bounty!', 'error');
+        return;
+      }
+      const bounty = 2500;
+      cfEarnedTotal += bounty;
+      balanceNGN = parseFloat((balanceNGN + bounty).toFixed(2));
+      updateBalanceUI();
+      document.getElementById('cfTotalEarned').textContent = `NGN ${formatNGN(cfEarnedTotal)}`;
+      cfClipReady = false;
+      playCashoutSfx(true);
+      showToast('Published to TikTok/Reels! +NGN 2,500.00 credited to PLUGBET wallet!', 'win');
+    }
+
+    function upgradeCineFlowPlan(planName, costNGN) {
+      if (costNGN > balanceNGN) {
+        showToast(`Insufficient NGN balance for ${planName}. Top up via Cashier!`, 'error');
+        openCashier('deposit');
+        return;
+      }
+      balanceNGN = parseFloat((balanceNGN - costNGN).toFixed(2));
+      updateBalanceUI();
+      playCashoutSfx(false);
+      showToast(`CineFlow ${planName} activated! Enjoy priority AI rendering.`, 'win');
+    }
+
+    // =========================================================================
+    // 11. INITIALIZE APPLICATION ON WINDOW LOAD
+    // =========================================================================
+    window.onload = async function () {
+      resizeCanvas();
+      updateBalanceUI();
+      renderHistoryRibbon();
+      renderLiveMatches();
+      renderVfFixtures();
+      renderJackpotFixtures();
+      await prepareNextRoundSeed();
+      startWaitingPhase();
+      lastFrameTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    };
   </script>
 </body>
 </html>

@@ -109,17 +109,20 @@
     <div class="max-w-[1440px] mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-3">
       <!-- Brand Identity -->
       <div class="flex items-center gap-4 min-w-0">
-        <button onclick="switchWorkspace('studio')" class="flex items-center gap-2.5 shrink-0 text-left cursor-pointer group">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition">
+        <div class="flex items-center gap-2.5 shrink-0 text-left group">
+          <button onclick="switchWorkspace('studio')" class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition cursor-pointer">
             <span class="text-white font-black text-lg">▶</span>
-          </div>
+          </button>
           <div class="leading-tight">
             <div class="font-black text-base sm:text-lg tracking-tight text-white flex items-center gap-1.5">
-              CineFlow <span class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-1.5 py-0.5 rounded uppercase">Enterprise</span>
+              <span onclick="switchWorkspace('studio')" class="cursor-pointer">CineFlow</span>
+              <button id="enterpriseModeBadge" onclick="toggleEnterprisePureMode()" title="Toggle Enterprise Pure Mode (hides Creator Lounge for B2B studio demos)" class="text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-300 border border-indigo-500/40 px-1.5 py-0.5 rounded uppercase cursor-pointer transition">
+                Enterprise
+              </button>
             </div>
             <div class="text-[10px] text-slate-400 font-semibold hidden sm:block">AI Post-Production • EU GDPR Ready 🇪🇪</div>
           </div>
-        </button>
+        </div>
 
         <!-- Primary Navigation -->
         <nav class="hidden md:flex items-center gap-1.5 text-xs font-bold">
@@ -133,9 +136,9 @@
             <span>⚡</span> Plans & Minutes
           </button>
 
-          <div class="h-5 w-px bg-[#272d3f] mx-1"></div>
+          <div id="topNavDivider" class="h-5 w-px bg-[#272d3f] mx-1"></div>
 
-          <!-- Secondary Side-Piece Arcade Trigger -->
+          <!-- Secondary Side-Piece Arcade Trigger (hidden automatically in ?mode=enterprise) -->
           <button id="topNav-lounge" onclick="switchWorkspace('lounge')" class="px-3 py-2 rounded-lg text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/30 cursor-pointer transition flex items-center gap-1.5">
             <span>🎮</span> Creator Lounge <span class="text-[9px] bg-white/10 text-slate-300 px-1.5 py-0.5 rounded uppercase">Side Games</span>
           </button>
@@ -399,8 +402,8 @@
       </div>
     </div>
 
-    <!-- Subtle Footer Link to Side-Piece Creator Lounge -->
-    <div class="bg-[#11141d] border border-[#232838] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+    <!-- Subtle Footer Link to Side-Piece Creator Lounge (hidden automatically in ?mode=enterprise) -->
+    <div id="studioLoungePromoBanner" class="bg-[#11141d] border border-[#232838] rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-lg">🎮</div>
         <div>
@@ -822,6 +825,64 @@
     let soundEnabled = true;
     let activeWorkspace = 'studio';
     let activeLoungeGame = 'aviator';
+    let enterprisePureMode = false;
+
+    function applyEnterprisePureMode(enabled, notify = false) {
+      enterprisePureMode = Boolean(enabled);
+      try {
+        sessionStorage.setItem('cineflow_enterprise_pure', enterprisePureMode ? '1' : '0');
+      } catch (e) {}
+
+      const topLounge = document.getElementById('topNav-lounge');
+      const topDivider = document.getElementById('topNavDivider');
+      const mLounge = document.getElementById('mNav-lounge');
+      const promoBanner = document.getElementById('studioLoungePromoBanner');
+      const badge = document.getElementById('enterpriseModeBadge');
+
+      if (enterprisePureMode) {
+        if (topLounge) topLounge.style.display = 'none';
+        if (topDivider) topDivider.style.display = 'none';
+        if (mLounge) mLounge.style.display = 'none';
+        if (promoBanner) promoBanner.style.display = 'none';
+        if (badge) {
+          badge.textContent = 'Enterprise Pure';
+          badge.className = 'text-[10px] font-extrabold bg-emerald-500/20 hover:bg-emerald-500/35 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded uppercase cursor-pointer transition';
+        }
+        if (activeWorkspace === 'lounge') {
+          switchWorkspace('studio');
+        }
+        if (notify) showToast('Enterprise Pure Mode ON — Creator Lounge hidden for studio demos.', 'info');
+      } else {
+        if (topLounge) topLounge.style.display = '';
+        if (topDivider) topDivider.style.display = '';
+        if (mLounge) mLounge.style.display = '';
+        if (promoBanner) promoBanner.style.display = '';
+        if (badge) {
+          badge.textContent = 'Enterprise';
+          badge.className = 'text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-300 border border-indigo-500/40 px-1.5 py-0.5 rounded uppercase cursor-pointer transition';
+        }
+        if (notify) showToast('Full Workspace Mode — Creator Lounge visible.', 'info');
+      }
+    }
+
+    function toggleEnterprisePureMode() {
+      playClickSfx();
+      applyEnterprisePureMode(!enterprisePureMode, true);
+    }
+
+    function initUrlModeFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const modeParam = (params.get('mode') || '').toLowerCase();
+      let savedPure = false;
+      try { savedPure = sessionStorage.getItem('cineflow_enterprise_pure') === '1'; } catch (e) {}
+
+      if (modeParam === 'enterprise' || params.get('enterprise') === '1' || savedPure) {
+        applyEnterprisePureMode(true, false);
+      } else if (modeParam === 'lounge') {
+        applyEnterprisePureMode(false, false);
+        switchWorkspace('lounge');
+      }
+    }
 
     function formatMoney(ngnVal) {
       const safe = Number(ngnVal) || 0;
@@ -879,6 +940,9 @@
     // 2. WORKSPACE & CREATOR LOUNGE NAVIGATION
     // =========================================================================
     function switchWorkspace(view) {
+      if (view === 'lounge' && enterprisePureMode) {
+        view = 'studio';
+      }
       activeWorkspace = view;
       const views = ['studio', 'earn', 'billing', 'lounge'];
       views.forEach(v => {
@@ -1781,6 +1845,7 @@
     }
 
     window.onload = function () {
+      initUrlModeFromQuery();
       renderViralShortsList();
       renderHistoryRibbon();
       renderLiveMatches();

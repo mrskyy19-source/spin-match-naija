@@ -220,7 +220,7 @@
     <!-- Collapsible CineFlow Backend API Configuration Drawer -->
     <div id="apiConfigDrawer" class="hidden studio-card rounded-2xl p-4 border border-indigo-500/40 flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="text-xs font-black text-indigo-300 uppercase tracking-wider">⚡ Live Backend Connection (FFmpeg + Whisper Pipeline)</div>
+        <div class="text-xs font-black text-indigo-300 uppercase tracking-wider">⚡ Live Backend Connection (Next.js Web + FFmpeg/Whisper Worker)</div>
         <div class="flex items-center gap-2">
           <button onclick="checkCineFlowBackendHealth()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-extrabold cursor-pointer transition">
             🔄 Test & Sync Cloud Jobs
@@ -238,12 +238,12 @@
           <input id="apiUploadPathInput" type="text" value="/api/upload" onchange="saveApiConfig()" class="w-full bg-[#0b0e15] border border-[#282f44] rounded-lg px-2.5 py-1.5 font-mono-num text-xs text-white focus:outline-none focus:border-indigo-500" />
         </div>
         <div>
-          <label class="text-[10px] font-extrabold text-slate-400 uppercase block mb-1">Jobs / Status Endpoint</label>
-          <input id="apiJobsPathInput" type="text" value="/api/videos" onchange="saveApiConfig()" class="w-full bg-[#0b0e15] border border-[#282f44] rounded-lg px-2.5 py-1.5 font-mono-num text-xs text-white focus:outline-none focus:border-indigo-500" />
+          <label class="text-[10px] font-extrabold text-slate-400 uppercase block mb-1">Jobs Queue Endpoint</label>
+          <input id="apiJobsPathInput" type="text" value="/api/jobs" onchange="saveApiConfig()" class="w-full bg-[#0b0e15] border border-[#282f44] rounded-lg px-2.5 py-1.5 font-mono-num text-xs text-white focus:outline-none focus:border-indigo-500" />
         </div>
       </div>
       <div id="apiDiagnosticNote" class="text-[11px] text-slate-400">
-        Uploads send <code class="text-indigo-300">multipart/form-data</code> directly to your Render backend. If the server is asleep or blocks cross-origin requests, CineFlow automatically falls back to local 9:16 preview mode.
+        Uploads send <code class="text-indigo-300">POST /api/upload</code> (S3/R2 storage) and automatically dispatch <code class="text-indigo-300">POST /api/jobs</code> to your Whisper + FFmpeg worker.
       </div>
     </div>
 
@@ -346,7 +346,7 @@
 
           <!-- 9:16 Vertical Viewport -->
           <div class="w-full max-w-[290px] aspect-[9/16] rounded-[26px] bg-black border-4 border-[#272f45] shadow-2xl relative overflow-hidden flex flex-col justify-between">
-            <!-- Real HTML5 Video Element (shown when user uploads a local file) -->
+            <!-- Real HTML5 Video Element (shown when user uploads a local file or cloud clip loads) -->
             <video id="studioVideoPlayer" class="hidden absolute inset-0 w-full h-full object-cover" controls playsinline loop></video>
 
             <!-- Stylized Studio Preview Backdrop (when using sample clips) -->
@@ -1014,11 +1014,11 @@
     }
 
     // =========================================================================
-    // 3. CINEFLOW STUDIO: LIVE BACKEND API + 9:16 PREVIEW & AI VIRAL SHORTS
+    // 3. CINEFLOW STUDIO: NEXT.JS UPLOAD + WORKER JOBS PIPELINE
     // =========================================================================
     let cineflowApiBase = 'https://cineflow-web-pjh4.onrender.com';
     let cineflowUploadPath = '/api/upload';
-    let cineflowJobsPath = '/api/videos';
+    let cineflowJobsPath = '/api/jobs';
     let selectedVideoFile = null;
     let currentMasterDownloadUrl = null;
     let activePollInterval = null;
@@ -1059,25 +1059,25 @@
       setCloudStatus('busy', 'Connecting...');
       const diag = document.getElementById('apiDiagnosticNote');
       try {
-        const res = await fetch(`${cineflowApiBase}${cineflowJobsPath}`, { method: 'GET' });
+        const res = await fetch(`${cineflowApiBase}${cineflowJobsPath}?userId=enterprise-studio`, { method: 'GET' });
         if (res.ok) {
           setCloudStatus('online', 'Cloud API Live');
           const data = await res.json().catch(() => null);
           diag.innerHTML = `<span class="text-emerald-400 font-bold">✓ Connected to ${cineflowApiBase}${cineflowJobsPath}</span>`;
           if (data) hydrateFromCloudJobList(data);
-          showToast('Connected to CineFlow Render backend!', 'win');
+          showToast('Connected to CineFlow Render backend & worker!', 'win');
         } else {
           setCloudStatus('standby', `HTTP ${res.status}`);
-          diag.innerHTML = `<span class="text-amber-300 font-bold">Server responded with HTTP ${res.status}.</span> Verify your endpoint paths above (e.g., <code>/api/videos</code> or <code>/dashboard</code>).`;
+          diag.innerHTML = `<span class="text-amber-300 font-bold">Server responded with HTTP ${res.status}.</span> Verify CORS middleware is deployed on <code>${cineflowApiBase}</code>.`;
         }
       } catch (err) {
         setCloudStatus('standby', 'Local Fallback');
-        diag.innerHTML = `<span class="text-amber-300 font-bold">Cross-origin or cold-start fallback active.</span> Make sure CORS is enabled on <code>${cineflowApiBase}</code> (or deploy this UI on the same domain).`;
+        diag.innerHTML = `<span class="text-amber-300 font-bold">Cross-origin or cold-start fallback active.</span> Push <code>web/next.config.js</code> & <code>web/src/middleware.ts</code> to enable CORS on <code>${cineflowApiBase}</code>.`;
       }
     }
 
     function hydrateFromCloudJobList(payload) {
-      const items = Array.isArray(payload) ? payload : (payload.videos || payload.jobs || []);
+      const items = Array.isArray(payload) ? payload : (payload.jobs || payload.videos || []);
       if (!items.length) return;
       applyCloudJobResult(items[0]);
     }
@@ -1087,9 +1087,9 @@
       if (job.filename || job.originalName || job.name) {
         document.getElementById('activeFileName').textContent = job.filename || job.originalName || job.name;
       }
-      const masterUrl = job.outputUrl || job.masterUrl || job.videoUrl || job.url;
+      const masterUrl = job.output_url || job.outputUrl || job.master_url || job.masterUrl || job.videoUrl || job.url;
       if (masterUrl) {
-        const resolvedMaster = masterUrl.startsWith('http') ? masterUrl : `${cineflowApiBase}${masterUrl}`;
+        const resolvedMaster = masterUrl.startsWith('http') ? masterUrl : `${cineflowApiBase}${masterUrl.startsWith('/') ? '' : '/'}${masterUrl}`;
         currentMasterDownloadUrl = resolvedMaster;
         const videoEl = document.getElementById('studioVideoPlayer');
         const sampleEl = document.getElementById('studioSampleCanvas');
@@ -1100,15 +1100,15 @@
       const clips = job.shorts || job.clips || job.highlights;
       if (Array.isArray(clips) && clips.length > 0) {
         currentShorts = clips.map((c, idx) => {
-          const rawUrl = c.url || c.downloadUrl || c.outputUrl || null;
+          const rawUrl = c.url || c.download_url || c.downloadUrl || c.output_url || c.outputUrl || null;
           return {
             id: c.id || idx + 1,
             title: c.title || `Highlight Short #${idx + 1}`,
             range: c.range || (c.start !== undefined ? `${c.start}s – ${c.end}s` : '00:00 – 00:30'),
             hook: (c.hook || c.title || 'CINEFLOW AI AUTOPILOT').toUpperCase(),
-            caption: c.caption || c.transcript || 'Rendered via CineFlow Cloud FFmpeg + Whisper pipeline.',
+            caption: c.caption || c.transcript || 'Rendered via CineFlow Cloud FFmpeg + Whisper worker.',
             score: c.score || 95,
-            downloadUrl: rawUrl ? (rawUrl.startsWith('http') ? rawUrl : `${cineflowApiBase}${rawUrl}`) : null
+            downloadUrl: rawUrl ? (rawUrl.startsWith('http') ? rawUrl : `${cineflowApiBase}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`) : null
           };
         });
         renderViralShortsList();
@@ -1210,47 +1210,72 @@
       wrap.classList.remove('hidden');
       wrap.classList.add('flex');
       statusBadge.textContent = 'Uploading to Cloud...';
-      lbl.textContent = `Uploading ${file.name} to ${cineflowApiBase}...`;
-      pct.textContent = '5%';
-      bar.style.width = '5%';
+      lbl.textContent = `1/3 Uploading ${file.name} to EU S3/R2 storage...`;
+      pct.textContent = '10%';
+      bar.style.width = '10%';
       setCloudStatus('busy', 'Uploading...');
 
+      // Matches web/src/app/api/upload/route.ts (expects formData.get("file"))
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('video', file);
-      formData.append('language', document.getElementById('studioLangSelect').value);
-      formData.append('captionStyle', document.getElementById('studioCaptionStyle').value);
-      formData.append('topic', document.getElementById('studioTopicInput').value.trim());
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${cineflowApiBase}${cineflowUploadPath}`, true);
 
       xhr.upload.onprogress = (evt) => {
         if (evt.lengthComputable) {
-          const uploadPct = Math.min(60, Math.round((evt.loaded / evt.total) * 60));
+          const uploadPct = Math.min(50, Math.round((evt.loaded / evt.total) * 50));
           bar.style.width = `${uploadPct}%`;
           pct.textContent = `${uploadPct}%`;
-          lbl.textContent = `Uploading raw footage to EU Cloud (${uploadPct}%)...`;
+          lbl.textContent = `1/3 Uploading raw footage to EU Cloud (${uploadPct}%)...`;
         }
       };
 
-      xhr.onload = () => {
+      xhr.onload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          setCloudStatus('online', 'Rendering Job');
-          let resp = {};
-          try { resp = JSON.parse(xhr.responseText); } catch (e) {}
-          const jobId = resp.id || resp.jobId || resp.videoId || (resp.video && resp.video.id);
+          let uploadResp = {};
+          try { uploadResp = JSON.parse(xhr.responseText); } catch (e) {}
 
-          if (resp.status === 'completed' || resp.outputUrl || resp.masterUrl) {
-            finalizeCloudRender(resp, file.name);
-          } else if (jobId) {
-            lbl.textContent = 'Cloud FFmpeg & Whisper transcription running...';
-            bar.style.width = '75%';
-            pct.textContent = '75%';
-            statusBadge.textContent = 'AI Processing...';
-            pollCineFlowJob(jobId, file.name);
+          if (uploadResp.key) {
+            // Step 2: Queue job on web/src/app/api/jobs/route.ts -> cineflow-worker-8hci
+            lbl.textContent = '2/3 Dispatching FFmpeg + Whisper worker job...';
+            bar.style.width = '65%';
+            pct.textContent = '65%';
+            statusBadge.textContent = 'Queuing Worker...';
+            setCloudStatus('busy', 'Worker Queued');
+
+            try {
+              const jobRes = await fetch(`${cineflowApiBase}${cineflowJobsPath}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  s3Key: uploadResp.key,
+                  filename: file.name,
+                  userId: 'enterprise-studio'
+                })
+              });
+
+              const jobResp = await jobRes.json().catch(() => ({}));
+              const jobId = jobResp.job_id || jobResp.jobId || jobResp.id;
+
+              if (jobRes.ok && jobId) {
+                lbl.textContent = '3/3 Whisper transcription & 9:16 FFmpeg rendering in progress...';
+                bar.style.width = '80%';
+                pct.textContent = '80%';
+                statusBadge.textContent = 'AI Processing...';
+                setCloudStatus('online', 'Worker Rendering');
+                pollCineFlowJob(jobId, file.name);
+              } else {
+                setCloudStatus('standby', 'Local Preview');
+                showToast('Upload stored, worker busy — running local 9:16 preview.', 'info');
+                runStudioRenderPipeline(file.name);
+              }
+            } catch (err) {
+              setCloudStatus('standby', 'Local Preview');
+              runStudioRenderPipeline(file.name);
+            }
           } else {
-            finalizeCloudRender(resp, file.name);
+            finalizeCloudRender(uploadResp, file.name);
           }
         } else {
           setCloudStatus('standby', 'Local Preview');
@@ -1272,15 +1297,16 @@
       if (activePollInterval) clearInterval(activePollInterval);
       let attempts = 0;
 
+      // Matches web/src/app/api/jobs/route.ts -> GET /api/jobs?jobId=...
       activePollInterval = setInterval(async () => {
         attempts++;
         try {
-          const res = await fetch(`${cineflowApiBase}${cineflowJobsPath}/${encodeURIComponent(jobId)}`);
+          const res = await fetch(`${cineflowApiBase}${cineflowJobsPath}?jobId=${encodeURIComponent(jobId)}`);
           if (!res.ok) throw new Error('Poll status error');
           const job = await res.json();
           const st = (job.status || '').toLowerCase();
 
-          if (st === 'completed' || st === 'done' || job.outputUrl || job.masterUrl) {
+          if (st === 'completed' || st === 'done' || job.output_url || job.outputUrl || job.master_url) {
             clearInterval(activePollInterval);
             finalizeCloudRender(job, fileName);
           } else if (st === 'failed' || st === 'error') {
@@ -1289,9 +1315,9 @@
             document.getElementById('activeFileStatus').textContent = 'Failed';
             showToast(job.error || 'Cloud render failed. Falling back to local preview.', 'error');
             runStudioRenderPipeline(fileName);
-          } else if (attempts >= 40) {
+          } else if (attempts >= 48) {
             clearInterval(activePollInterval);
-            showToast('Render still queued on Render worker — check back shortly.', 'info');
+            showToast('Render still running on worker — click Test & Sync Cloud Jobs shortly.', 'info');
           }
         } catch (err) {
           clearInterval(activePollInterval);
@@ -1452,7 +1478,7 @@
     }
 
     function copyReferralLink() {
-      const link = 'https://cineflow.ee/?ref=founder-studio';
+      const link = 'https://cineflow.mctouchintelligence.eu/?mode=enterprise&ref=founder-studio';
       navigator.clipboard?.writeText(link).catch(() => {});
       playClickSfx();
       showToast('Partner referral link copied! Earn 30% recurring rev-share.', 'info');
